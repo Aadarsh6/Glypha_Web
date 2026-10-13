@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useReducedMotion } from '../hooks';
 import { Icon, CopyButton, Reveal } from './ui';
-import { TerminalDemo } from './TerminalRepl';
-// import { TerminalDemo } from './TerminalDemo';
+import { TerminalRepl } from './TerminalRepl';
 
 function FieldCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -137,7 +136,7 @@ export function Hero() {
         </div>
 
         <Reveal delay={120} className="lg:col-span-7 min-w-0">
-          <TerminalDemo />
+          <TerminalRepl />
         </Reveal>
       </div>
     </section>
