@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useReducedMotion } from '../hooks';
 import { Icon, CopyButton, Reveal } from './ui';
-import { TerminalDemo } from './TerminalDemo';
+import { TerminalDemo } from './TerminalRepl';
 // import { TerminalDemo } from './TerminalDemo';
 
 function FieldCanvas() {
