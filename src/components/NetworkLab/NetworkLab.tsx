@@ -7,6 +7,7 @@ import { Icon, Reveal, SectionHeader } from '../ui';
 import { Topology } from './Topology';
 import { Inspector } from './Inspector';
 import { useNetworkSimulation } from './useSim';
+import { motion, AnimatePresence } from 'motion/react';
 
 const EventLog = memo(function EventLog({ log, live }: { log: LogEntry[]; live: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -106,10 +107,16 @@ export function NetworkLab() {
             <div className="grid items-start gap-4.5 lg:grid-cols-[minmax(0,1fr)_340px]">
               <div>
                 <div className="stagehead">
-                  <p className="stage-k">STAGE 0{snap.stage} / 03</p>
-                  <h3 className="stage-n">{stage.name}</h3>
-                  <p className="stage-d">{stage.desc}</p>
-                </div>
+  <AnimatePresence mode="wait" initial={false}>
+    <motion.div key={snap.stage}
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.22 }}>
+      <p className="stage-k">STAGE 0{snap.stage} / 03</p>
+      <h3 className="stage-n">{STAGES[snap.stage].name}</h3>
+      <p className="stage-d">{STAGES[snap.stage].desc}</p>
+    </motion.div>
+  </AnimatePresence>
+</div>
 
                 <Topology snap={snap} t={t} onSelect={select} />
 
@@ -129,8 +136,14 @@ export function NetworkLab() {
               </div>
 
               <aside className="insp" aria-label="Node inspector">
-                <Inspector snap={snap} onCompare={runComparison} />
-              </aside>
+  <AnimatePresence mode="wait" initial={false}>
+    <motion.div key={`${snap.stage}-${snap.selected ?? 'none'}`}
+      initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }}
+      transition={{ duration: 0.2 }}>
+      <Inspector snap={snap} onCompare={runComparison} />
+    </motion.div>
+  </AnimatePresence>
+</aside>
             </div>
 
             <EventLog log={snap.log} live={snap.playing} />
