@@ -5,6 +5,7 @@ const LINKS = [
   { href: '#how-it-works', id: 'how-it-works', label: 'How it works' },
   { href: '#security', id: 'security', label: 'Security' },
   { href: '#quickstart', id: 'quickstart', label: 'Quick start' },
+  { href: '#observatory', id: 'observatory', label: 'Observatory' },
 ];
 
 export function Navbar() {
