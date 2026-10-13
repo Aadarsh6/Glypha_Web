@@ -1,10 +1,27 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { Navbar } from './components/Navbar';
+import { Hero } from './components/Hero';
+import { NetworkLab } from './components/NetworkLab/NetworkLab';
+import { ProtocolStrip } from './components/ProtocolStrip';
+import { SystemOverview } from './components/SystemOverview';
+import { SecuritySection } from './components/SecuritySection';
+import { QuickStart } from './components/QuickStart';
+import { OpenSourceCTA } from './components/OpenSourceCTA';
+import { Footer } from './components/Footer';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+export default function App() {
+  return (
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <NetworkLab />
+        <ProtocolStrip />
+        <SystemOverview />
+        <SecuritySection />
+        <QuickStart />
+        <OpenSourceCTA />
+      </main>
+      <Footer />
+    </>
+  );
+}
