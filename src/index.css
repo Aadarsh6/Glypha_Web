@@ -497,3 +497,28 @@ html.lenis, html.lenis body { height: auto; }
 @media (prefers-reduced-motion: reduce) {
   .rf-edge-flow, .rf-edge-meta { animation: none; }
 }
+
+/* react-flow chrome — scoped with .obsbox so they beat the library's
+   own stylesheet regardless of CSS injection order */
+.obsbox .react-flow { background: var(--color-panel); }
+.obsbox .react-flow__handle { width: 5px; height: 5px; background: #4A544A; border: none; }
+.obsbox .react-flow__controls { box-shadow: none; border: 1px solid var(--color-line); border-radius: 0; overflow: hidden; }
+.obsbox .react-flow__controls button { background: var(--color-elev); color: var(--color-mute); border-bottom: 1px solid var(--color-line); width: 26px; height: 26px; }
+.obsbox .react-flow__controls button:hover { background: #111411; }
+.obsbox .react-flow__controls button svg { fill: currentColor; }
+.obsbox .react-flow__minimap { background: #0C0E0C; border: 1px solid var(--color-line); }
+
+/* attribution: moved to bottom-center — visible, clickable, out of the
+   minimap's corner (bottom-right) and the controls' corner (bottom-left) */
+.obsbox .react-flow__attribution {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 4px;
+  background: transparent;
+  color: #3F463F;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .06em;
+}
+.obsbox .react-flow__attribution:hover { color: var(--color-mute); }
