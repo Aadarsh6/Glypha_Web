@@ -449,14 +449,14 @@ html.lenis, html.lenis body { height: auto; }
 .labnote.warn { color: var(--color-warn); }
 .kv b.warnv { color: var(--color-warn); }
 
-.rf-peer, .rf-coord, .rf-watch { font-family: var(--font-mono);
-  transition: border-color .2s; }
+/* react-flow custom nodes & edges */
+.rf-peer, .rf-coord, .rf-watch { font-family: var(--font-mono); transition: border-color .2s; }
 .rf-peer { width: 176px; background: var(--color-elev); border: 1px solid var(--color-line); padding: 10px 12px; }
 .rf-coord { width: 190px; background: #131613; border: 1px dashed #4A544A; padding: 10px 12px; }
 .rf-watch { width: 220px; background: #131613; border: 1px solid rgba(231, 184, 109, .4); padding: 10px 12px; }
-.react-flow__node.selected .rf-peer,
-.react-flow__node.selected .rf-coord,
-.react-flow__node.selected .rf-watch { border-color: var(--color-accent); }
+.obsbox .react-flow__node.selected .rf-peer,
+.obsbox .react-flow__node.selected .rf-coord,
+.obsbox .react-flow__node.selected .rf-watch { border-color: var(--color-accent); }
 .rf-top { display: flex; align-items: center; gap: 8px; }
 .rf-led { width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); flex: none; }
 .rf-led.warn { background: var(--color-warn); }
@@ -481,29 +481,14 @@ html.lenis, html.lenis body { height: auto; }
 .rf-edge-meta { stroke-dasharray: 4 6; animation: rfflow 1.2s linear infinite; }
 @keyframes rfflow { to { stroke-dashoffset: -11; } }
 
-.react-flow { background: var(--color-panel); }
-.react-flow__handle { width: 5px; height: 5px; background: #4A544A; border: none; }
-.react-flow__controls { box-shadow: none; border: 1px solid var(--color-line); border-radius: 0; overflow: hidden; }
-.react-flow__controls button { background: var(--color-elev); color: var(--color-mute);
-  border-bottom: 1px solid var(--color-line); width: 26px; height: 26px; }
-.react-flow__controls button:hover { background: #111411; }
-.react-flow__controls button svg { fill: currentColor; }
-.react-flow__minimap { background: #0C0E0C; border: 1px solid var(--color-line); }
-.react-flow__attribution { background: transparent; color: #3F463F; }
-@media (max-width: 720px) {
-  .react-flow__minimap { display: none; }
-  .react-flow__controls { display: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .rf-edge-flow, .rf-edge-meta { animation: none; }
-}
-
-/* react-flow chrome — scoped with .obsbox so they beat the library's
-   own stylesheet regardless of CSS injection order */
+/* react-flow chrome — scoped with .obsbox so it beats the library's
+   stylesheet regardless of CSS injection order (Observatory is lazy-loaded,
+   so @xyflow's CSS lands AFTER this file) */
 .obsbox .react-flow { background: var(--color-panel); }
 .obsbox .react-flow__handle { width: 5px; height: 5px; background: #4A544A; border: none; }
 .obsbox .react-flow__controls { box-shadow: none; border: 1px solid var(--color-line); border-radius: 0; overflow: hidden; }
-.obsbox .react-flow__controls button { background: var(--color-elev); color: var(--color-mute); border-bottom: 1px solid var(--color-line); width: 26px; height: 26px; }
+.obsbox .react-flow__controls button { background: var(--color-elev); color: var(--color-mute);
+  border-bottom: 1px solid var(--color-line); width: 26px; height: 26px; }
 .obsbox .react-flow__controls button:hover { background: #111411; }
 .obsbox .react-flow__controls button svg { fill: currentColor; }
 .obsbox .react-flow__minimap { background: #0C0E0C; border: 1px solid var(--color-line); }
@@ -522,3 +507,11 @@ html.lenis, html.lenis body { height: auto; }
   letter-spacing: .06em;
 }
 .obsbox .react-flow__attribution:hover { color: var(--color-mute); }
+
+@media (max-width: 720px) {
+  .obsbox .react-flow__minimap { display: none; }
+  .obsbox .react-flow__controls { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rf-edge-flow, .rf-edge-meta { animation: none; }
+}
