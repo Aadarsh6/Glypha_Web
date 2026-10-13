@@ -426,3 +426,74 @@ footer { border-top: 1px solid var(--color-line); padding: 56px 0 32px; backgrou
   .cline, #e-pulse, .logdot, .cursor { animation: none !important; }
   .rv { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
+
+/* ---------- REPL ---------- */
+.repl-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.repl-row .p { color: var(--color-accent); font: 500 12.5px var(--font-mono); }
+.repl-input { flex: 1; min-width: 0; background: transparent; border: none; outline: none;
+  color: var(--color-ink); font: 400 12.5px var(--font-mono); caret-color: var(--color-accent); }
+.repl-input:disabled { opacity: .5; }
+.repl-row:focus-within { outline: none; }
+
+/* ---------- lenis ---------- */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+
+/* ---------- observatory ---------- */
+.obsbox { position: relative; border: 1px solid var(--color-line); background: var(--color-panel);
+  height: clamp(420px, 58vh, 600px); }
+.tab[aria-pressed="true"] { color: var(--color-ink); background: var(--color-elev);
+  border-color: #4A544A; position: relative; z-index: 1; }
+.tab[aria-pressed="true"] b { color: var(--color-accent); }
+.tab[aria-pressed="false"] { opacity: .7; }
+.labnote.warn { color: var(--color-warn); }
+.kv b.warnv { color: var(--color-warn); }
+
+.rf-peer, .rf-coord, .rf-watch { font-family: var(--font-mono);
+  transition: border-color .2s; }
+.rf-peer { width: 176px; background: var(--color-elev); border: 1px solid var(--color-line); padding: 10px 12px; }
+.rf-coord { width: 190px; background: #131613; border: 1px dashed #4A544A; padding: 10px 12px; }
+.rf-watch { width: 220px; background: #131613; border: 1px solid rgba(231, 184, 109, .4); padding: 10px 12px; }
+.react-flow__node.selected .rf-peer,
+.react-flow__node.selected .rf-coord,
+.react-flow__node.selected .rf-watch { border-color: var(--color-accent); }
+.rf-top { display: flex; align-items: center; gap: 8px; }
+.rf-led { width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); flex: none; }
+.rf-led.warn { background: var(--color-warn); }
+.rf-name { font: 600 12px var(--font-mono); letter-spacing: .1em; color: var(--color-ink); }
+.rf-watch .rf-name { color: var(--color-warn); }
+.rf-fp { font: 500 10.5px var(--font-mono); color: #AEB6AD; margin-top: 6px; letter-spacing: .04em; }
+.rf-addr { font: 400 10px var(--font-mono); color: var(--color-faint); margin-top: 2px; }
+.rf-addr.warn { color: var(--color-warn); }
+.rf-exposed { display: inline-block; font: 600 8.5px var(--font-mono); letter-spacing: .12em;
+  color: var(--color-warn); border: 1px solid rgba(231, 184, 109, .35); padding: 3px 6px; margin-top: 8px; }
+.rf-watch-note { font: 500 9px var(--font-mono); letter-spacing: .08em; margin-top: 8px;
+  color: var(--color-warn); }
+.rf-role { font: 400 9.5px var(--font-mono); color: var(--color-faint); margin-top: 6px; }
+
+.rf-elabel { position: absolute; font: 500 9.5px var(--font-mono); letter-spacing: .08em;
+  padding: 2px 6px; background: var(--color-bg); border: 1px solid var(--color-line);
+  pointer-events: none; white-space: nowrap; }
+.rf-elabel.acc { color: var(--color-accent); border-color: rgba(103, 221, 161, .4); }
+.rf-elabel.warn { color: var(--color-warn); border-color: rgba(231, 184, 109, .4); }
+
+.rf-edge-flow { stroke-dasharray: 5 7; animation: rfflow 1s linear infinite; }
+.rf-edge-meta { stroke-dasharray: 4 6; animation: rfflow 1.2s linear infinite; }
+@keyframes rfflow { to { stroke-dashoffset: -11; } }
+
+.react-flow { background: var(--color-panel); }
+.react-flow__handle { width: 5px; height: 5px; background: #4A544A; border: none; }
+.react-flow__controls { box-shadow: none; border: 1px solid var(--color-line); border-radius: 0; overflow: hidden; }
+.react-flow__controls button { background: var(--color-elev); color: var(--color-mute);
+  border-bottom: 1px solid var(--color-line); width: 26px; height: 26px; }
+.react-flow__controls button:hover { background: #111411; }
+.react-flow__controls button svg { fill: currentColor; }
+.react-flow__minimap { background: #0C0E0C; border: 1px solid var(--color-line); }
+.react-flow__attribution { background: transparent; color: #3F463F; }
+@media (max-width: 720px) {
+  .react-flow__minimap { display: none; }
+  .react-flow__controls { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rf-edge-flow, .rf-edge-meta { animation: none; }
+}
