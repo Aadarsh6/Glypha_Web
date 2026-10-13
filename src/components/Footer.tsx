@@ -1,4 +1,3 @@
-import { Icon } from './ui';
 
 const REPO = 'https://github.com/Aadarsh6/glypha';
 

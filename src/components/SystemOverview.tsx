@@ -1,4 +1,4 @@
-import { Icon, Reveal, SectionHeader } from './ui';
+import { Reveal, SectionHeader } from './ui';
 
 const ROWS = [
   {

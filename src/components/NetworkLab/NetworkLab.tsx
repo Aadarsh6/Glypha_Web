@@ -3,9 +3,10 @@ import { STAGES, type LogEntry, type Stage } from '../../data/sim';
 import { onStageRequest } from '../../data/stageBus';
 import { useReducedMotion } from '../../hooks';
 import { Icon, Reveal, SectionHeader } from '../ui';
-import { useNetworkSimulation } from './useSim';
+// import { useNetworkSimulation } from './useSim';
 import { Topology } from './Topology';
 import { Inspector } from './Inspector';
+import { useNetworkSimulation } from './useSim';
 
 const EventLog = memo(function EventLog({ log, live }: { log: LogEntry[]; live: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -40,7 +41,7 @@ const EventLog = memo(function EventLog({ log, live }: { log: LogEntry[]; live: 
 
 export function NetworkLab() {
   const reduced = useReducedMotion();
-  const labRef = useRef<HTMLDivElement>(null);
+  const labRef = useRef<HTMLDivElement>(null!);
   const sim = useNetworkSimulation(labRef);
   const { snap, t, goto, toggle, replay, reset, select, runComparison, transmit } = sim;
   const [tx, setTx] = useState('see you at 19:00');
