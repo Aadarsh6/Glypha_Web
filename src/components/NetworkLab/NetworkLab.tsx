@@ -1,15 +1,16 @@
-import { useEffect, useRef, useState, memo } from 'react';
+import { useEffect, useRef, useState, memo, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { STAGES, type LogEntry, type Stage } from '../../data/sim';
 import { onStageRequest } from '../../data/stageBus';
+import { scrollToEl } from '../../lib/scroll';
 import { useReducedMotion } from '../../hooks';
 import { Icon, Reveal, SectionHeader } from '../ui';
-// import { useNetworkSimulation } from './useSim';
+import { useNetworkSimulation } from './useSim';
 import { Topology } from './Topology';
 import { Inspector } from './Inspector';
-import { useNetworkSimulation } from './useSim';
-import { motion, AnimatePresence } from 'motion/react';
 
 const EventLog = memo(function EventLog({ log, live }: { log: LogEntry[]; live: boolean }) {
+  const reduced = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -28,11 +29,17 @@ const EventLog = memo(function EventLog({ log, live }: { log: LogEntry[]; live: 
           e.kind === 'divider' ? (
             <div key={e.id} className="ldiv">{e.msg}</div>
           ) : (
-            <div key={e.id} className={`le ${e.kind ?? ''}`}>
+            <motion.div
+              key={e.id}
+              initial={{ opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: reduced ? 0 : 0.2 }}
+              className={`le ${e.kind ?? ''}`}
+            >
               <span className="lt">t+{(e.t / 1000).toFixed(1)}s</span>
               <span className="lg">{e.tag}</span>
               <span className="lm">{e.msg}</span>
-            </div>
+            </motion.div>
           ),
         )}
       </div>
@@ -47,14 +54,14 @@ export function NetworkLab() {
   const { snap, t, goto, toggle, replay, reset, select, runComparison, transmit } = sim;
   const [tx, setTx] = useState('see you at 19:00');
 
-  /* protocol-strip buttons deep-link into the lab */
+  /* protocol-strip buttons deep-link into the lab (Lenis-aware) */
   useEffect(() => onStageRequest(n => {
     goto(n);
-    labRef.current?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-  }), [goto, reduced]);
+    scrollToEl(labRef.current);
+  }), [goto]);
 
   const tabsRef = useRef<HTMLDivElement>(null);
-  const onTabKeys = (e: React.KeyboardEvent) => {
+  const onTabKeys = (e: ReactKeyboardEvent) => {
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
     const tabs = Array.from(tabsRef.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? []);
     const i = tabs.indexOf(document.activeElement as HTMLButtonElement);
@@ -65,7 +72,6 @@ export function NetworkLab() {
   };
 
   const statusText = `stage 0${snap.stage} · ${snap.playing ? 'running' : snap.started ? 'paused' : 'idle'} · t+${(t / 1000).toFixed(1)}s`;
-  const stage = STAGES[snap.stage as Stage];
 
   return (
     <section id="how-it-works" className="hairtop">
@@ -107,16 +113,20 @@ export function NetworkLab() {
             <div className="grid items-start gap-4.5 lg:grid-cols-[minmax(0,1fr)_340px]">
               <div>
                 <div className="stagehead">
-  <AnimatePresence mode="wait" initial={false}>
-    <motion.div key={snap.stage}
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.22 }}>
-      <p className="stage-k">STAGE 0{snap.stage} / 03</p>
-      <h3 className="stage-n">{STAGES[snap.stage].name}</h3>
-      <p className="stage-d">{STAGES[snap.stage].desc}</p>
-    </motion.div>
-  </AnimatePresence>
-</div>
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      key={snap.stage}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: reduced ? 0 : 0.22 }}
+                    >
+                      <p className="stage-k">STAGE 0{snap.stage} / 03</p>
+                      <h3 className="stage-n">{STAGES[snap.stage].name}</h3>
+                      <p className="stage-d">{STAGES[snap.stage].desc}</p>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
 
                 <Topology snap={snap} t={t} onSelect={select} />
 
@@ -136,14 +146,18 @@ export function NetworkLab() {
               </div>
 
               <aside className="insp" aria-label="Node inspector">
-  <AnimatePresence mode="wait" initial={false}>
-    <motion.div key={`${snap.stage}-${snap.selected ?? 'none'}`}
-      initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }}
-      transition={{ duration: 0.2 }}>
-      <Inspector snap={snap} onCompare={runComparison} />
-    </motion.div>
-  </AnimatePresence>
-</aside>
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={`${snap.stage}-${snap.selected ?? 'none'}`}
+                    initial={{ opacity: 0, x: 6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -6 }}
+                    transition={{ duration: reduced ? 0 : 0.2 }}
+                  >
+                    <Inspector snap={snap} onCompare={runComparison} />
+                  </motion.div>
+                </AnimatePresence>
+              </aside>
             </div>
 
             <EventLog log={snap.log} live={snap.playing} />
