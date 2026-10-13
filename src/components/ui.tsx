@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { motion } from 'motion/react';
 import { useReducedMotion } from '../hooks';
 
 /* ---------- icons ---------- */
@@ -71,27 +72,17 @@ export function CopyButton({ text, label = 'command', className }: { text: strin
 
 /* ---------- reveal-on-scroll wrapper ---------- */
 export function Reveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
-  const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    if (reduced) return;
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      es => es.forEach(e => { if (e.isIntersecting) { setInView(true); io.disconnect(); } }),
-      { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [reduced]);
-
-  const style = delay ? ({ '--d': `${delay}ms` } as CSSProperties) : undefined;
   return (
-    <div ref={ref} className={`rv ${reduced || inView ? 'in' : ''} ${className ?? ''}`} style={style}>
+    <motion.div
+      className={className}
+      initial={reduced ? false : { opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '0px 0px -8% 0px' }}
+      transition={{ duration: 0.55, delay: reduced ? 0 : delay / 1000, ease: [0.2, 0.7, 0.2, 1] }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
