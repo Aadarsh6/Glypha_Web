@@ -18,8 +18,8 @@ export default function App() {
         <Hero />
         <QuickStart />
         <Ladder />
-        <Stack />
         <Notes />
+        <Stack />
         <Security />
         <Outro />
       </main>
