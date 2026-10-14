@@ -106,20 +106,76 @@ h2 { font: 600 clamp(30px, 4vw, 44px)/1.08 var(--font-display); letter-spacing: 
 #nav.open .mnav { display: flex; }
 @media (max-width: 880px) { .nlinks { display: none; } #menu-btn { display: inline-flex; } }
 
-/* ---------- hero ---------- */
-#hero { position: relative; overflow: hidden; padding-top: 128px; padding-bottom: 64px;
-  min-height: 96svh; display: flex; align-items: center; }
-#field { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-#hero h1 { font: 600 clamp(38px, 4.4vw, 62px)/1.04 var(--font-display);
-  letter-spacing: -.015em; margin: 22px 0 20px; }
-#hero h1 .l2 { display: block; color: var(--color-mute); }
-.hero-p { color: var(--color-mute); max-width: 46ch; margin-bottom: 32px; }
-.cta-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 26px; }
-.inst { display: inline-flex; align-items: center; gap: 12px; border: 1px solid var(--color-line);
-  background: var(--color-panel); padding: 9px 8px 9px 14px; font: 500 12.5px var(--font-mono); }
-.inst .ip { color: var(--color-accent); }
-.inst code { color: var(--color-ink); }
+/* ---------- hero v2 — the ladder ---------- */
+.hero2 { position: relative; overflow: hidden; padding-top: 136px; padding-bottom: 88px;
+  min-height: 92svh; display: flex; align-items: center; }
+.hero2-grid { display: grid; grid-template-columns: repeat(12, 1fr);
+  gap: clamp(24px, 3vw, 48px); align-items: center; width: 100%; position: relative; z-index: 1; }
+.hero2-copy { grid-column: 1 / 6; }
+.hero2-ladder { grid-column: 6 / 13; min-width: 0; }
+@media (max-width: 1023px) { .hero2-copy, .hero2-ladder { grid-column: 1 / -1; } }
 
+.kicker { font: 500 11px var(--font-mono); letter-spacing: .22em; color: var(--color-mute);
+  text-transform: uppercase; }
+.hero2 h1 { font: 600 clamp(38px, 4.4vw, 68px)/1.05 var(--font-display);
+  letter-spacing: -.015em; margin: 20px 0 18px; }
+.hero2 h1 .l2 { display: block; color: var(--color-mute); }
+.hero2-sub { color: var(--color-mute); max-width: 46ch; margin-bottom: 30px; font-size: 16px; }
+.h2facts { display: flex; flex-wrap: wrap; margin-top: 30px;
+  border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); }
+.h2facts span { font: 500 9.5px var(--font-mono); letter-spacing: .14em;
+  color: var(--color-mute); padding: 11px 14px 11px 0; }
+.h2facts span:not(:last-child) { border-right: 1px solid var(--color-line); padding-right: 14px; }
+
+/* fingerprint weave — identity as texture */
+.fpweave { position: absolute; inset: 0; pointer-events: none; user-select: none;
+  display: flex; flex-direction: column; justify-content: center; gap: 1.4em;
+  font: 500 clamp(28px, 4vw, 54px)/1 var(--font-mono); letter-spacing: .12em;
+  color: var(--color-ink); opacity: .05; white-space: nowrap; overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 20%, #000 55%, transparent);
+  animation: fpdrift 110s linear infinite alternate; }
+@keyframes fpdrift { to { transform: translateX(-6%); } }
+
+/* ladder machine */
+.ladder { border: 1px solid var(--color-line); background: var(--color-panel); }
+.lad-svg { display: block; width: 100%; height: auto; padding: 8px 6px 2px; }
+.ladder-log { height: 150px; overflow-y: auto; padding: 12px 16px 8px;
+  border-top: 1px solid var(--color-line);
+  font: 400 11.5px/1.9 var(--font-mono); }
+.ladder-note { margin-top: 10px; font: 400 10.5px var(--font-mono);
+  color: var(--color-faint); letter-spacing: .04em; }
+
+.pbox { fill: var(--color-elev); stroke: var(--color-line); }
+.pname { font: 600 13px var(--font-mono); letter-spacing: .12em; fill: var(--color-ink); }
+.pname.sm { font-size: 10.5px; letter-spacing: .16em; }
+.psub { font: 400 9.5px var(--font-mono); fill: var(--color-faint); letter-spacing: .06em; }
+.pfp { font: 500 9px var(--font-mono); fill: #8E978E; letter-spacing: .1em; }
+
+.rung { transition: opacity .5s; }
+.rung.idle { opacity: .3; }
+.pth { stroke: #39413A; stroke-width: 1.4; fill: none;
+  transition: stroke .45s, stroke-dasharray .45s, stroke-width .45s; }
+.pth.ghost { stroke: #242924; stroke-dasharray: 2 5; }
+.rung.trying .pth, .rung.dialing .pth { stroke: #8A948A; }
+.rung.failed .pth { stroke: rgba(231, 184, 109, .45); stroke-dasharray: 4 6; }
+.rung.live .pth { stroke: var(--color-accent); stroke-width: 1.6; }
+.barrier { stroke: #5A635A; stroke-width: 1; stroke-dasharray: 3 4; }
+.blabel { font: 500 8px var(--font-mono); fill: #5F685F; letter-spacing: .18em; }
+.rlabel { font: 500 10px var(--font-mono); fill: var(--color-mute); letter-spacing: .16em; }
+.rung.live .rlabel { fill: var(--color-accent); }
+.lst { font: 600 9.5px var(--font-mono); letter-spacing: .1em; fill: #5F685F; }
+.lst.try { fill: #B9C0B7; }
+.lst.fail { fill: var(--color-warn); }
+.lst.live { fill: var(--color-accent); }
+.ldot { fill: #B9C0B7; }
+.failx line { stroke: var(--color-warn); stroke-width: 1.8; stroke-linecap: round; }
+.relaybox { fill: #131613; stroke: #4A544A; stroke-dasharray: 4 4; }
+.rung.live .relaybox { stroke: rgba(103, 221, 161, .5); }
+.byte { fill: var(--color-accent); opacity: .9; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fpweave { animation: none; }
+}
 /* ---------- terminal ---------- */
 .term { border: 1px solid var(--color-line); background: var(--color-panel); }
 .term-head { display: flex; justify-content: space-between; align-items: center; height: 44px;
