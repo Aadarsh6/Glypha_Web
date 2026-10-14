@@ -159,9 +159,30 @@ section { position: relative; padding-block: clamp(96px, 12vw, 176px); }
   color: var(--color-faint); }
 .hero-line { font: 500 11.5px var(--font-mono); letter-spacing: .2em;
   color: var(--color-mute); margin: 20px 0 30px; }
-.hero .cta-row { justify-content: center; margin-bottom: 24px; }
+
 .hero-facts { font: 500 9.5px var(--font-mono); letter-spacing: .13em;
   color: var(--color-faint); margin-top: 24px; max-width: 72ch; }
+
+/* delete the old `.hero .cta-row` rule, then add: */
+.btn-key { display: inline-flex; align-items: center; gap: 10px; height: 44px;
+  padding: 0 20px; font: 600 12px var(--font-mono); letter-spacing: .16em;
+  color: var(--color-accent); background: rgba(103, 221, 161, .06);
+  border: 1px solid rgba(103, 221, 161, .45); text-decoration: none;
+  transition: background .18s, color .18s, border-color .18s; }
+.btn-key:hover { background: var(--color-accent); color: #060706; border-color: var(--color-accent); }
+.btn-key .ic { transition: transform .18s; }
+.btn-key:hover .ic { transform: translateX(3px); }
+
+.hero .cta-row { justify-content: center; align-items: stretch; gap: 12px;
+  flex-wrap: wrap; margin: 0 0 16px; }
+.hero .inst { height: 44px; padding: 0 8px 0 16px; }
+
+.hero-src { display: inline-flex; align-items: center; gap: 8px;
+  font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--color-faint); text-decoration: none; margin: 0 0 6px;
+  transition: color .18s; }
+.hero-src:hover { color: var(--color-ink); }
+
 .hero-status { width: 100%; display: flex; justify-content: space-between;
   align-items: center; gap: 14px; flex-wrap: wrap;
   border-top: 1px solid var(--color-line); padding-top: 14px;
