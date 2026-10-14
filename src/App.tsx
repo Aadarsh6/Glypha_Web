@@ -4,7 +4,7 @@ import { Ladder } from './components/Ladder';
 import { Notes } from './components/Notes';
 import { QuickStart } from './components/QuickStart';
 import { Footer } from './components/Footer';
-import { Nav } from './components/Navbar';
+import { Nav } from './components/Nav';
 import { Stack } from './components/Stcak';
 import { Security } from './components/Security';
 import { Outro } from './components/Outro';
