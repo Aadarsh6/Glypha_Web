@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { onFieldStats, type Stats } from '../engine/field';
+import { onFieldStats } from '../engine/field';
 import { Decode, Icon, CopyButton } from './ui';
+
+type Stats = { nodes: number; pkt: number };
 
 export function Hero() {
   const [stats, setStats] = useState<Stats>({ nodes: 0, pkt: 0 });

@@ -31,6 +31,8 @@ function mulberry32(a: number) {
 interface Stats { nodes: number; pkt: number }
 type StatsFn = (s: Stats) => void;
 const statsFns = new Set<StatsFn>();
+// This module intentionally exposes the stats subscription alongside the canvas component.
+// eslint-disable-next-line react-refresh/only-export-components
 export function onFieldStats(fn: StatsFn): () => void {
   statsFns.add(fn);
   return () => { statsFns.delete(fn); };
@@ -68,7 +70,7 @@ export function Field() {
     let last = 0, spawn = 0, spawnCount = 0, statTime = 0, driftA = 0, scanA = 0;
     let dirty = true;
 
-    let cur = { yaw: SHOTS.hero.yaw, pitch: SHOTS.hero.pitch, dist: SHOTS.hero.dist, obs: 0, dim: SHOTS.hero.dim };
+    const cur = { yaw: SHOTS.hero.yaw, pitch: SHOTS.hero.pitch, dist: SHOTS.hero.dist, obs: 0, dim: SHOTS.hero.dim };
     let shot: Shot = SHOTS.hero;
     let tx = 0, ty = 0;
 

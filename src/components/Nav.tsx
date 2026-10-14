@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { onFieldStats, type Stats } from '../engine/field';
+import { onFieldStats } from '../engine/field';
 import { Icon } from './ui';
+
+type Stats = { nodes: number; pkt: number };
 
 const LINKS = [
   { href: '#stack', id: 'stack', label: 'The stack' },
