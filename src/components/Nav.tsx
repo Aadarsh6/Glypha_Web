@@ -10,8 +10,8 @@ const MIN_STARS_TO_SHOW = 1; // raise this if you would rather hide a small coun
 const LINKS = [
   { href: '#quickstart', id: 'quickstart', label: 'Quick start' },
   { href: '#ladder', id: 'ladder', label: 'How it works' },
-  { href: '#stack', id: 'stack', label: 'The stack' },
   { href: '#notes', id: 'notes', label: 'Field notes' },
+  { href: '#stack', id: 'stack', label: 'The stack' },
   { href: '#security', id: 'security', label: 'Security' },
 ];
 
