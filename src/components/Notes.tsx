@@ -12,7 +12,7 @@ export function Notes() {
     <section id="notes" data-shot="notes" className="hairtop">
       <div className="wrap">
         <SectionHead
-          index="04" kicker="Field notes"
+          index="03" kicker="Field notes"
           title="Two honest failures."
           lede="Glypha's engineering log records what actually happened, including the parts that didn't work. Both entries below are from the real deployment."
         />
