@@ -647,3 +647,32 @@ html.lenis, html.lenis body { height: auto; }
   color: #B9C0B7; border-top: 1px solid var(--color-line); }
 .natflow { animation: natdash .8s linear infinite; }
 @keyframes natdash { to { stroke-dashoffset: -16; } }
+
+/* ---------- quickstart v3 — strips & quotes, not boxes ---------- */
+.qs .cmdline { display: flex; align-items: center; gap: 12px; background: var(--color-elev);
+  padding: 12px 6px 12px 14px; max-width: 660px; }
+.qs .cmdline + .cmdline { margin-top: 2px; }
+.qs .cmdline .p { color: var(--color-accent); font: 500 12.5px var(--font-mono); flex: none; }
+.qs .cmdline code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap;
+  font: 400 12.5px var(--font-mono); color: var(--color-ink); }
+.qs .copy { border: 0; background: transparent; }
+.qs .copy:hover { border: 0; background: rgba(103, 221, 161, .07); }
+
+.peer-tag { display: flex; align-items: center; gap: 8px;
+  font: 500 9.5px var(--font-mono); letter-spacing: .16em;
+  color: var(--color-faint); margin: 16px 0 6px; }
+.peer-tag:first-of-type { margin-top: 4px; }
+.peer-tag i { width: 6px; height: 6px; background: var(--color-accent); border-radius: 50%; flex: none; }
+
+.term-out { border-left: 2px solid var(--color-line); padding: 10px 0 10px 18px;
+  margin: 12px 0 4px; max-width: 660px;
+  font: 400 11.5px/1.9 var(--font-mono); color: var(--color-mute); }
+.term-out .ok { color: var(--color-accent); }
+
+.qs-note { margin-top: 14px; font: 400 11px var(--font-mono);
+  color: var(--color-faint); letter-spacing: .03em; }
+
+/* steps become plain ruled rows on all sizes */
+.qs-step { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 20px;
+  padding: 34px 0; border-top: 1px solid var(--color-line); }
+.qs-step:last-of-type { border-bottom: 1px solid var(--color-line); }
