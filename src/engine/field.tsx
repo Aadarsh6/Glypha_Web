@@ -31,6 +31,8 @@ function mulberry32(a: number) {
 interface Stats { nodes: number; pkt: number }
 type StatsFn = (s: Stats) => void;
 const statsFns = new Set<StatsFn>();
+// This module intentionally exposes the field's stats subscription alongside its component.
+// eslint-disable-next-line react-refresh/only-export-components
 export function onFieldStats(fn: StatsFn): () => void {
   statsFns.add(fn);
   return () => { statsFns.delete(fn); };
@@ -84,7 +86,7 @@ export function Field() {
     let last = 0, spawn = 0, spawnCount = 0, statTime = 0, driftA = 0, scanA = 0;
     let dirty = true;
 
-    let cur = { yaw: SHOTS.hero.yaw, pitch: SHOTS.hero.pitch, dist: SHOTS.hero.dist, obs: 0, dim: SHOTS.hero.dim };
+    const cur = { yaw: SHOTS.hero.yaw, pitch: SHOTS.hero.pitch, dist: SHOTS.hero.dist, obs: 0, dim: SHOTS.hero.dim };
     let shot: Shot = SHOTS.hero;
     let tx = 0, ty = 0;
 
@@ -156,8 +158,9 @@ export function Field() {
         ctx.beginPath();
         for (let i = 0; i <= 96; i++) {
           const a = (i / 96) * TAU;
-          const p = project.apply?.call?.(null); // placeholder removed below
-          void p;
+          const q = ringPoint(ring, a);
+          const p = project(q.x, q.y, q.z);
+          if (i === 0) ctx.moveTo(p.sx, p.sy); else ctx.lineTo(p.sx, p.sy);
         }
         ctx.stroke();
       });
