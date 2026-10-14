@@ -1,67 +1,60 @@
 import { useEffect, useState } from 'react';
 import { onFieldStats, type Stats } from '../engine/field';
-import { Decode } from './ui';
-import { Icon, CopyButton } from './ui';
-
-function HeroSide() {
-  const [stats, setStats] = useState<Stats>({ nodes: 0, pkt: 0 });
-  useEffect(() => onFieldStats(setStats), []);
-  return (
-    <div className="hero-side" aria-hidden="true">
-      <div className="hs">
-        <span className="hs-k">LIVE FIELD</span>
-        <span className="hs-v live">{stats.nodes} NODES · {stats.pkt} PKT/S</span>
-      </div>
-      <div className="hs">
-        <span className="hs-k">YOU</span>
-        <span className="hs-v">7F3A 9C1B 42DE 0817</span>
-        <span className="hs-v">E5C0 61AA 3B9D F2E4</span>
-        <span className="hs-s">SHA-256 PUBLIC KEY · PINNED</span>
-      </div>
-      <div className="hs legend">
-        <span><i className="g" />PEER</span>
-        <span><i className="a" />OBSERVER</span>
-      </div>
-    </div>
-  );
-}
+import { Decode, Icon, CopyButton } from './ui';
 
 export function Hero() {
+  const [stats, setStats] = useState<Stats>({ nodes: 0, pkt: 0 });
+  useEffect(() => onFieldStats(setStats), []);
+
   return (
     <section id="hero" data-shot="hero" className="hero">
-      <div className="wrap hero-grid">
-        <div className="hero-copy">
-          <p className="kicker">GLYPHA · PEER-TO-PEER ENCRYPTED CHAT · EVERY LAYER BY HAND</p>
-          <h1 className="h1">
-            <Decode text="Sockets up." delay={0} /><br />
-            <Decode text="Keys local." delay={220} /><br />
-            <span className="l2"><Decode text="Relay when NATs say no." delay={440} /></span>
-          </h1>
-          <p className="hero-sub">
-            Glypha builds its own chat stack in readable Python — framing, identity, encryption,
-            discovery, NAT traversal, relay, encrypted history. Every layer on this page links to
-            the file that implements it.
+      <div className="wrap hero-col">
+
+        <p className="kicker hero-top">PEER-TO-PEER ENCRYPTED CHAT · EVERY LAYER BY HAND</p>
+
+        <div className="hero-mid">
+          <svg className="hero-mark" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="6.5" cy="17.5" r="4.2" />
+            <circle cx="17.5" cy="6.5" r="4.2" />
+            <line x1="9.7" y1="14.3" x2="14.3" y2="9.7" />
+          </svg>
+
+          <div className="wm-wrap">
+            <h1 className="wordmark"><Decode text="GLYPHA" delay={150} /></h1>
+            <span className="wm-ver" aria-hidden="true">v2.3</span>
+          </div>
+
+          <p className="hero-line">
+            <Decode text="SOCKETS UP · KEYS LOCAL · RELAY WHEN NATS SAY NO" delay={650} />
           </p>
+
           <div className="cta-row">
             <a className="btn btn-primary" href="#quickstart">Get started</a>
             <a className="tlink" href="https://github.com/Aadarsh6/GLYPHA" target="_blank" rel="noopener">
               Read the source<Icon name="arrow" size={14} />
             </a>
           </div>
+
           <div className="inst">
             <span className="ip">$</span><code>pip install glypha</code>
             <CopyButton text="pip install glypha" label="install command" />
           </div>
-          <div className="h3facts">
-            <span>X25519 + XSALSA20-POLY1305</span>
-            <span>TOFU + KEY PINNING</span>
-            <span>ENCRYPTED SQLITE HISTORY</span>
-            <span>22 TESTS</span>
-            <span>MIT</span>
-          </div>
+
+          <p className="hero-facts">
+            X25519 · XSALSA20-POLY1305 · TOFU + KEY PINNING · ENCRYPTED SQLITE HISTORY · MIT
+          </p>
         </div>
 
-        <HeroSide />
+        <div className="hero-status" aria-label="Live field status">
+          <span>FIELD <b>{stats.nodes} NODES · {stats.pkt} PKT/S</b></span>
+          <span className="fpv">YOU&nbsp; 7F3A 9C1B 42DE 0817 · PINNED</span>
+          <span className="legend">
+            <span><i className="g" />PEER</span>
+            <span><i className="a" />OBSERVER</span>
+          </span>
+          <span className="scr">SCROLL ↓ 01 · THE STACK</span>
+        </div>
+
       </div>
     </section>
   );
