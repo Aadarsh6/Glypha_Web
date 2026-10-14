@@ -28,7 +28,6 @@ function mulberry32(a: number) {
 export interface Stats { nodes: number; pkt: number }
 type StatsFn = (s: Stats) => void;
 const statsFns = new Set<StatsFn>();
-// This module intentionally exports the stats subscription alongside Field.
 // eslint-disable-next-line react-refresh/only-export-components
 export function onFieldStats(fn: StatsFn): () => void {
   statsFns.add(fn);
@@ -38,23 +37,30 @@ export function onFieldStats(fn: StatsFn): () => void {
 const HEX = '0123456789ABCDEF';
 const MARGIN = 28;
 
-/* The hidden text the lens decrypts. Real facts from the project. */
+/* Hidden plaintext — real facts, repeating along each row so any lens
+   position catches a readable fragment. */
 const SECRET = [
-  'the code is right. the networks refuse.',
-  'direct failed. traversal failed. relay.',
-  'keys stay local. relay when NATs say no.',
-  'X25519 key exchange, XSalsa20-Poly1305 seal',
-  'frame = [4-byte length][payload]',
-  'a frame over 1 MiB is rejected before allocation',
-  'the relay has no crypto library installed',
-  'peer verified against pinned key',
-  'every layer is readable python',
-  '22 tests. 45 lines of framing.',
-  'no accounts. your keys are your identity.',
-  'educational. honest. deliberately not signal.',
-].map(s => s + '   //   ');
+  'the code is right. the networks refuse.   //   ',
+  'direct failed. traversal failed. relay.   //   ',
+  'keys stay local. relay when NATs say no.   //   ',
+  'X25519 key exchange, XSalsa20-Poly1305 seal   //   ',
+  'frame = [4-byte length][payload]   //   ',
+  'a frame over 1 MiB is rejected before allocation   //   ',
+  'the relay has no crypto library installed   //   ',
+  'peer verified against pinned key   //   ',
+  'every layer is readable python   //   ',
+  '22 tests. no accounts. your keys are your identity.   //   ',
+  'educational. honest. deliberately not signal.   //   ',
+];
 
-const hc = (r: number, c: number) => (((Math.imul(r, 73856093) ^ Math.imul(c, 19349663)) >>> 0) % 1000) / 1000;
+/* palette — nothing off-system */
+const C_INK = '233,236,231';
+const C_GREEN = '103,221,161';
+const C_AMBER = '231,184,109';
+
+const hc = (r: number, c: number) =>
+  (((Math.imul(r, 73856093) ^ Math.imul(c, 19349663)) >>> 0) % 1000) / 1000;
+
 const LENS_CW = 8.2, LENS_CH = 17;
 
 interface Layer {
@@ -68,7 +74,7 @@ interface Layer {
 }
 
 interface Hot { l: number; c: number; r: number; age: number }
-/* fate: 'drop' packets hit a wall and die red, 'relay' packets turn green and get through */
+/* fate: 'drop' hits the wall and dies amber; anything else turns green and gets through */
 interface Pkt { row: number; col: number; dir: number; len: number; v: number; turn: number; drop: boolean; dying: number }
 
 export function Field() {
@@ -89,7 +95,7 @@ export function Field() {
     let last = 0, mutT = 0, spawnT = 0, bandT = 0, statT = 0, spawnCount = 0;
     let dirty = true;
     let tx = 0, ty = 0;
-    const lens = { x: -999, y: -999, mx: -999, my: -999, a: 0, t: 0, r: 150 };
+    const lens = { x: -999, y: -999, mx: -999, my: -999, a: 0, t: 0, r: 0, R: 150 };
 
     const cur = { dim: SHOTS.hero.dim, obs: 0 };
     let shot: Shot = SHOTS.hero;
@@ -150,50 +156,77 @@ export function Field() {
     const buildLayers = () => {
       const rng = mulberry32(0x676c7970); // "glyp"
       layers = [
-        makeLayer(rng, 9, 20, 17, 0.24, false, '174,182,173', 0.05, '103,221,161', 0.08, 0.02, 4),
-        makeLayer(rng, 13, 30, 24, 0.14, true, '233,236,231', 0.07, '103,221,161', 0.10, 0.03, 8),
+        makeLayer(rng, 9, 20, 17, 0.28, false, '174,182,173', 0.05, C_GREEN, 0.08, 0.02, 4),
+        makeLayer(rng, 13, 30, 24, 0.16, true, C_INK, 0.07, C_GREEN, 0.10, 0.03, 8),
       ];
       hot = []; pkts = [];
-      lens.r = Math.max(105, Math.min(170, W * 0.11));
+      lens.R = Math.max(110, Math.min(175, W * 0.11));
       if (layers[1]) statsFns.forEach(f => f({ nodes: layers[1].cols * layers[1].rows, pkt: 0 }));
     };
 
-    /* the decryption lens: ciphertext under the cursor resolves into plaintext */
+    /* ============ the decryption lens ============ */
     const drawLens = (ts: number) => {
-      if (lens.a < 0.01) return;
-      const { x, y, r: R, a } = lens;
+      if (lens.r < 6 || lens.a < 0.02) return;
+      const { x, y, a } = lens;
+      const R = lens.r;
+      const tick = Math.floor(ts / 110);
+
+      /* soft dark pool — the ciphertext recedes under the lens */
       const g = ctx.createRadialGradient(x, y, 0, x, y, R);
-      g.addColorStop(0, `rgba(6,7,6,${(0.78 * a).toFixed(3)})`);
-      g.addColorStop(0.7, `rgba(6,7,6,${(0.45 * a).toFixed(3)})`);
+      g.addColorStop(0, `rgba(6,7,6,${(0.86 * a).toFixed(3)})`);
+      g.addColorStop(0.55, `rgba(6,7,6,${(0.6 * a).toFixed(3)})`);
+      g.addColorStop(0.85, `rgba(6,7,6,${(0.22 * a).toFixed(3)})`);
       g.addColorStop(1, 'rgba(6,7,6,0)');
       ctx.fillStyle = g;
       ctx.fillRect(x - R, y - R, R * 2, R * 2);
+
       ctx.font = '500 13px "JetBrains Mono", monospace';
-      const tick = Math.floor(ts / 90);
+
       const r0 = Math.floor((y - R) / LENS_CH), r1 = Math.ceil((y + R) / LENS_CH);
       const c0 = Math.floor((x - R) / LENS_CW), c1 = Math.ceil((x + R) / LENS_CW);
+
       for (let r = r0; r <= r1; r++) {
         const line = SECRET[((r % SECRET.length) + SECRET.length) % SECRET.length];
+        const start = (hc(r, 999) * 600) | 0; // each row's phrase begins somewhere else
+        const L = line.length;
         for (let c = c0; c <= c1; c++) {
           const px = c * LENS_CW + LENS_CW / 2, py = r * LENS_CH + LENS_CH / 2;
           const d = Math.hypot(px - x, py - y);
           if (d >= R) continue;
-          const ch = line[(((c + r * 5) % line.length) + line.length) % line.length];
-          if (ch === ' ') continue;
-          const t = 1 - d / R;
-          const th = hc(r, c) * 0.55 + 0.05; // each cell resolves at its own depth: ragged edge
-          if (t > th) {
-            const fresh = t - th < 0.07; // just decrypted: flash green
-            ctx.fillStyle = fresh
-              ? `rgba(103,221,161,${(0.9 * a).toFixed(3)})`
-              : `rgba(233,236,231,${((0.4 + 0.6 * t) * a).toFixed(3)})`;
-            ctx.fillText(ch, px, py);
+          const t = 1 - d / R; // 0 at rim, 1 at center
+
+          /* smooth reveal wavefront — small jitter so the edge breathes,
+             but the band is narrow: no speckle, a soft ring */
+          const th = hc(r, c) * 0.14;
+          const p = Math.max(0, Math.min(1, (t - th) / 0.22));
+
+          if (p <= 0) {
+            /* not yet resolved: faint green ciphertext, slowly shimmering */
+            ctx.fillStyle = `rgba(${C_GREEN},${((0.13 + 0.34 * t) * a).toFixed(3)})`;
+            ctx.fillText(HEX[(hc(r, c) * 16 + tick) % 16], px, py);
           } else {
-            ctx.fillStyle = `rgba(103,221,161,${((0.18 + 0.5 * t) * a).toFixed(3)})`;
-            ctx.fillText(HEX[(((hc(r, c) * 1000) | 0) + tick) % 16], px, py);
+            /* resolved plaintext; the front half shimmers green, settling to ink */
+            let idx = (c - start) % L;
+            if (idx < 0) idx += L;
+            const ch = line[idx];
+            if (ch === ' ') continue;
+            const m = Math.min(1, p * 1.8); // green → ink blend over the front
+            const rr = Math.round(103 + (233 - 103) * m);
+            const gg = Math.round(221 + (236 - 221) * m);
+            const bb = Math.round(161 + (231 - 161) * m);
+            const al = (0.38 + 0.62 * p) * a;
+            ctx.fillStyle = `rgba(${rr},${gg},${bb},${al.toFixed(3)})`;
+            ctx.fillText(ch, px, py);
           }
         }
       }
+
+      /* instrument framing — a scanner ring, not a naked hole */
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(${C_GREEN},${(0.26 * a).toFixed(3)})`;
+      ctx.beginPath(); ctx.arc(x, y, R * 0.99, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = `rgba(${C_GREEN},${(0.07 * a).toFixed(3)})`;
+      ctx.beginPath(); ctx.arc(x, y, R * 1.16, 0, Math.PI * 2); ctx.stroke();
     };
 
     const draw = (ts: number) => {
@@ -218,7 +251,7 @@ export function Field() {
           -MARGIN + L.py + h.r * L.cellH + L.cellH / 2);
       }
 
-      /* packets — blue while trying, then red (refused, dies) or green (relay, gets through) */
+      /* packets — ink while in flight; at the wall: amber (refused) or green (relayed) */
       const pr = Math.round(103 + (231 - 103) * cur.obs);
       const pg = Math.round(221 + (184 - 221) * cur.obs);
       const pb = Math.round(161 + (109 - 161) * cur.obs);
@@ -231,9 +264,9 @@ export function Field() {
             if (c < 0 || c >= L.cols) continue;
             const ch = L.cells[p.row][c];
             if (!ch) continue;
-            const a = (0.85 * Math.pow(1 - i / p.len, 1.4) + 0.05) * fade;
+            const a = (0.8 * Math.pow(1 - i / p.len, 1.4) + 0.05) * fade;
             const crossed = p.dir > 0 ? c >= p.turn : c <= p.turn;
-            const rgb = !crossed ? '110,155,255' : p.drop ? '255,122,89' : `${pr},${pg},${pb}`;
+            const rgb = !crossed ? C_INK : p.drop ? C_AMBER : `${pr},${pg},${pb}`;
             ctx.font = L.font;
             ctx.fillStyle = `rgba(${rgb},${a.toFixed(3)})`;
             ctx.fillText(ch,
@@ -268,7 +301,7 @@ export function Field() {
       ctx.fillStyle = `rgba(6,7,6,${cur.dim.toFixed(3)})`;
       ctx.fillRect(0, 0, W, H);
 
-      /* lens sits above the dim so the message stays readable in dark sections */
+      /* lens above the dim, so the message stays readable in dark sections */
       if (!reduced) drawLens(ts);
     };
 
@@ -288,14 +321,15 @@ export function Field() {
         return;
       }
 
-      /* pointer parallax — the two layers drift at different rates */
+      /* parallax + lens easing */
       for (const L of layers) {
         L.px += (tx * L.mult - L.px) * 0.06;
         L.py += (ty * L.mult * 0.6 - L.py) * 0.06;
       }
-      lens.x += (lens.mx - lens.x) * 0.2;
-      lens.y += (lens.my - lens.y) * 0.2;
+      lens.x += (lens.mx - lens.x) * 0.16;
+      lens.y += (lens.my - lens.y) * 0.16;
       lens.a += (lens.t - lens.a) * 0.12;
+      lens.r += (lens.R * lens.a - lens.r) * 0.16; // radius follows activity — pop-in/out
 
       /* mutations — a few cells rewrite themselves */
       mutT += dt;
@@ -369,11 +403,13 @@ export function Field() {
     const onMove = (e: PointerEvent) => {
       tx = (e.clientX / window.innerWidth - 0.5) * 2;
       ty = (e.clientY / window.innerHeight - 0.5) * 2;
-      if (e.pointerType === 'touch') return; // the lens is a mouse/pen thing
+      if (e.pointerType === 'touch') return; // the lens is a mouse/pen instrument
       if (lens.t === 0) { lens.x = e.clientX; lens.y = e.clientY; }
       lens.mx = e.clientX; lens.my = e.clientY;
-      // the lens lives in the negative space: it steps aside for real content
-      const onContent = (e.target as Element | null)?.closest?.('a,button,input,textarea,h1,h2,h3,h4,p,li,pre,.term,.natbox');
+      /* the lens lives in negative space: it steps aside for real content */
+      const onContent = (e.target as Element | null)?.closest?.(
+        'a,button,input,textarea,select,h1,h2,h3,h4,p,li,td,th,pre,table,.cmdline,.term,.ntable,.acc,.layer,.osrow',
+      );
       lens.t = onContent ? 0 : 1;
     };
     const onLeave = () => { lens.t = 0; };
@@ -407,7 +443,6 @@ export function Field() {
     resize();
     raf = requestAnimationFrame(frame);
 
-    /* re-render once JetBrains Mono has actually loaded */
     document.fonts.ready.then(() => { buildLayers(); dirty = true; }).catch(() => {});
 
     return () => {
