@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import { onFieldStats } from '../engine/field';
+import { onFieldStats, type Stats } from '../engine/field';
 import { Decode, Icon, CopyButton } from './ui';
-
-type Stats = { nodes: number; pkt: number };
 
 export function Hero() {
   const [stats, setStats] = useState<Stats>({ nodes: 0, pkt: 0 });
@@ -31,16 +29,18 @@ export function Hero() {
           </p>
 
           <div className="cta-row">
-            <a className="btn btn-primary" href="#quickstart">Get started</a>
-            <a className="tlink" href="https://github.com/Aadarsh6/GLYPHA" target="_blank" rel="noopener">
-              Read the source<Icon name="arrow" size={14} />
+            <a className="btn-key" href="#quickstart">
+              GET STARTED<Icon name="arrow" size={13} />
             </a>
+            <div className="inst">
+              <span className="ip">$</span><code>pip install glypha</code>
+              <CopyButton text="pip install glypha" label="install command" />
+            </div>
           </div>
 
-          <div className="inst">
-            <span className="ip">$</span><code>pip install glypha</code>
-            <CopyButton text="pip install glypha" label="install command" />
-          </div>
+          <a className="hero-src" href="https://github.com/Aadarsh6/GLYPHA" target="_blank" rel="noopener">
+            read the source<Icon name="arrow" size={11} />
+          </a>
 
           <p className="hero-facts">
             X25519 · XSALSA20-POLY1305 · TOFU + KEY PINNING · ENCRYPTED SQLITE HISTORY · MIT
@@ -48,13 +48,13 @@ export function Hero() {
         </div>
 
         <div className="hero-status" aria-label="Live field status">
-          <span>FIELD <b>{stats.nodes} NODES · {stats.pkt} PKT/S</b></span>
+          <span>FIELD <b>{stats.nodes.toLocaleString()} GLYPHS</b> · <b>{stats.pkt} PKT/S</b></span>
           <span className="fpv">YOU&nbsp; 7F3A 9C1B 42DE 0817 · PINNED</span>
           <span className="legend">
-            <span><i className="g" />PEER</span>
+            <span><i className="g" />PACKET</span>
             <span><i className="a" />OBSERVER</span>
           </span>
-          <span className="scr">SCROLL ↓ 01 · THE STACK</span>
+          <span className="scr">SCROLL ↓ 01 · QUICK START</span>
         </div>
 
       </div>
