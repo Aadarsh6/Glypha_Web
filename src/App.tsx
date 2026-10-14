@@ -10,6 +10,7 @@ import { QuickStart } from './components/QuickStart';
 import { Footer } from './components/Footer';
 import { Nav } from './components/Navbar';
 import { Stack } from './components/Stcak';
+import { Security } from './components/Security';
 
 export default function App() {
   return (
