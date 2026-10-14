@@ -29,7 +29,7 @@ function legacyCopy(text: string): boolean {
   const ta = document.createElement('textarea');
   ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
   document.body.appendChild(ta); ta.select();
-  let ok = false;
+  let ok: boolean;
   try { ok = document.execCommand('copy'); } catch { ok = false; }
   ta.remove();
   return ok;
@@ -63,7 +63,7 @@ export function Reveal({ children, className }: { children: ReactNode; className
   const reduced = useReducedMotion();
   const [inView, setInView] = useState(false);
   useEffect(() => {
-    if (reduced) { setInView(true); return; }
+    if (reduced) return;
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(
@@ -73,7 +73,7 @@ export function Reveal({ children, className }: { children: ReactNode; className
     io.observe(el);
     return () => io.disconnect();
   }, [reduced]);
-  return <div ref={ref} className={`rv ${inView ? 'in' : ''} ${className ?? ''}`}>{children}</div>;
+  return <div ref={ref} className={`rv ${inView || reduced ? 'in' : ''} ${className ?? ''}`}>{children}</div>;
 }
 
 /* ---------- decode — text that decrypts on arrival ---------- */
@@ -87,8 +87,7 @@ export function Decode({ text, className, delay = 0 }: { text: string; className
   const [out, setOut] = useState(() => (reduced ? text : scramble(text)));
 
   useEffect(() => {
-    if (reduced) { setOut(text); return; }
-    setOut(scramble(text));
+    if (reduced) return;
     const el = ref.current;
     if (!el) return;
     let raf = 0;
@@ -116,7 +115,7 @@ export function Decode({ text, className, delay = 0 }: { text: string; className
     return () => { io.disconnect(); cancelAnimationFrame(raf); };
   }, [text, delay, reduced]);
 
-  return <span ref={ref} className={className}>{out}</span>;
+  return <span ref={ref} className={className}>{reduced ? text : out}</span>;
 }
 
 /* ---------- section header ---------- */
