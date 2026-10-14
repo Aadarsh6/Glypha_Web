@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { onFieldStats, type Stats } from '../engine/field';
 import { Icon } from './ui';
-import './nav.css';
+import "./Nav.css"
 
 const REPO = 'Aadarsh6/GLYPHA';
 const REPO_URL = `https://github.com/${REPO}`;
