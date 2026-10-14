@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from '../hooks';
 import { Icon } from './ui';
+import type { NatSignal } from './NatDiagram';
 import { BOOT, COMMANDS, nextHint, runCommand, type RLine, type RState } from '../data/repl';
 
 const LINE_MS = 70;
@@ -16,7 +17,7 @@ function LineView({ L }: { L: RLine }) {
   return <div className={`ln ln-${L.kind}`}>{L.text}</div>;
 }
 
-export function TerminalRepl() {
+export function TerminalRepl({ onSignal }: { onSignal?: (s: NatSignal) => void }) {
   const reduced = useReducedMotion();
   const termRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -45,10 +46,17 @@ export function TerminalRepl() {
       }
       return;
     }
+    const L = queue[0];
+    const ms = reduced ? 0
+      : !booting.current ? LINE_MS
+      : L.kind === 'try' ? 850
+      : L.kind === 'fail' ? 1400
+      : L.kind === 'ok' && L.text.includes('connected') ? 1000
+      : LINE_MS;
     const t = window.setTimeout(() => {
-      setLines(prev => [...prev, queue[0]]);
+      setLines(prev => [...prev, L]);
       setQueue(q => q.slice(1));
-    }, reduced ? 0 : LINE_MS);
+    }, ms);
     return () => window.clearTimeout(t);
   }, [queue, reduced]);
 
@@ -67,6 +75,20 @@ export function TerminalRepl() {
     io.observe(el);
     return () => io.disconnect();
   }, []);
+
+  /* tell the diagram where the connection attempt is, from what the log actually says */
+  useEffect(() => {
+    if (!onSignal) return;
+    const sys = lines.filter(l => l.kind === 'try' || l.kind === 'fail' || l.kind === 'ok');
+    const has = (t: string) => sys.some(l => l.text.includes(t));
+    const stage = has('connected via relay') ? 5 : has('traversal failed') ? 4
+      : has('direct connect failed') ? 3 : has('trying direct') ? 2 : has('reaching') ? 1 : 0;
+    onSignal({
+      stage,
+      sent: lines.filter(l => l.kind === 'ciph').length,
+      tampers: lines.filter(l => l.kind === 'fail' && l.text.includes('bit flipped')).length,
+    });
+  }, [lines, onSignal]);
 
   /* keep newest line visible */
   useEffect(() => {
@@ -148,8 +170,8 @@ export function TerminalRepl() {
   return (
     <div className="term" ref={termRef} aria-label="Simulated interactive terminal">
       <div className="term-head">
-        <div className="term-id"><i />glypha — demo shell</div>
-        <span className="badge-sim"><i />SIMULATED</span>
+        <div className="term-id"><i />glypha chat you world</div>
+        <span className="badge-sim"><i />SIMULATED PEER</span>
       </div>
 
       <div
@@ -166,8 +188,8 @@ export function TerminalRepl() {
             onChange={e => setValue(e.target.value)} onKeyDown={onKeyDown}
             disabled={streaming}
             autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false}
-            aria-label="Terminal input — type a command, or help"
-            placeholder={hasBooted || !streaming ? '' : 'type `help`'}
+            aria-label="Terminal input: type a message, or help"
+            placeholder={hasBooted || !streaming ? '' : 'say hello'}
           />
         </form>
       </div>

@@ -1,212 +1,176 @@
-// Simulated glypha shell — every value illustrative.
-// VERIFY: command names + fingerprints against the real CLI before publishing.
+// Interactive glypha chat session, simulated peer, REAL crypto.
+// Identity keys are generated in the visitor's tab; messages are sealed with
+// the same primitives Glypha uses (NaCl Box: X25519 + XSalsa20-Poly1305), and
+// fingerprints follow peer.py's format_fingerprint (SHA-256, 4-hex groups).
+import nacl from 'tweetnacl';
+import { sha256 } from '../lib/sha256';
 
 export type Phase = 'fresh' | 'installed' | 'started' | 'connected' | 'verified';
 export interface RLine {
-  kind: 'cmd' | 'user' | 'out' | 'ok' | 'sys' | 'fp' | 'ciph' | 'err' | 'dim' | 'sp';
+  kind: 'cmd' | 'user' | 'out' | 'ok' | 'sys' | 'fp' | 'ciph' | 'err' | 'dim' | 'sp' | 'try' | 'fail';
   text: string;
   key?: string;
 }
 export interface RState { phase: Phase; sent: number }
 export interface CmdOut { lines: RLine[]; state?: Partial<RState> }
 
-const FP_A = '7F3A 9C1B 42DE 0817 E5C0 61AA 3B9D F2E4';
-const FP_B = '61AA 3B9D F2E4 7F3A 9C1B 42DE 0817 E5C0';
+const me = nacl.box.keyPair();
+const world = nacl.box.keyPair();
+const toHex = (u: Uint8Array) => Array.from(u, b => b.toString(16).padStart(2, '0')).join('');
+const fpOf = (pub: Uint8Array) => (toHex(sha256(pub)).match(/.{4}/g) ?? []).join(':');
+const FP_ME = fpOf(me.publicKey);
+const FP_WORLD = fpOf(world.publicKey);
+const half = (fp: string) => [fp.split(':').slice(0, 8).join(':'), fp.split(':').slice(8).join(':')];
 
-const hex = (s: string) =>
-  Array.from(s).map(c => (c.charCodeAt(0) ^ 0x5A).toString(16).padStart(2, '0').toUpperCase()).join(' ');
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+const seal = (t: string, from: nacl.BoxKeyPair, to: nacl.BoxKeyPair) => {
+  const nonce = nacl.randomBytes(24);
+  return { nonce, box: nacl.box(enc.encode(t), nonce, to.publicKey, from.secretKey) };
+};
+const open = (p: { nonce: Uint8Array; box: Uint8Array }, from: nacl.BoxKeyPair, to: nacl.BoxKeyPair) => {
+  const m = nacl.box.open(p.box, p.nonce, from.publicKey, to.secretKey);
+  return m ? dec.decode(m) : null;
+};
+const wire = (p: { nonce: Uint8Array; box: Uint8Array }): RLine => ({
+  kind: 'ciph',
+  text: `${toHex(p.nonce).slice(0, 12)}…${toHex(p.box).slice(0, 16)}…  ${24 + p.box.length} bytes on the wire`,
+});
 
-export const BOOT: RLine[] = [
-  { kind: 'cmd', text: 'pip install glypha' },
-  { kind: 'out', text: 'Collecting glypha' },
-  { kind: 'out', text: '  downloading glypha-0.1.0 — output abridged' },
-  { kind: 'ok', text: 'Successfully installed glypha-0.1.0' },
-  { kind: 'sp', text: '' },
-  { kind: 'cmd', text: 'glypha start' },
-  { kind: 'sys', key: 'identity', text: 'persistent keypair loaded' },
-  { kind: 'fp', text: `fingerprint  ${FP_A}` },
-  { kind: 'sys', key: 'net', text: 'rendezvous registered — coordination channel only' },
-  { kind: 'sys', key: 'net', text: 'listening for peers …' },
-  { kind: 'sp', text: '' },
-  { kind: 'dim', text: '— scripted intro ends here —' },
-  { kind: 'dim', text: 'your turn: type `help`, or `connect` to continue' },
+let lastSealed: { nonce: Uint8Array; box: Uint8Array } | null = null;
+const sentLog: string[] = [];
+const REPLIES = [
+  'received. the relay never saw a word.',
+  'my NAT said no too.',
+  'keys stay local. messages stay sealed.',
+  'nobody in the middle can read this.',
 ];
 
-const need = (st: RState, phases: Phase[], hint: string): CmdOut | null =>
-  phases.includes(st.phase) ? null : { lines: [{ kind: 'err', text: `not yet — ${hint}` }] };
+const [f1, f2] = half(FP_ME);
+export const BOOT: RLine[] = [
+  { kind: 'cmd', text: 'pip install glypha' },
+  { kind: 'out', text: '  downloading glypha-2.3.0 — output abridged' },
+  { kind: 'ok', text: 'Successfully installed glypha-2.3.0' },
+  { kind: 'sp', text: '' },
+  { kind: 'cmd', text: 'glypha chat you world' },
+  { kind: 'try', text: "• reaching 'world' via glypha.duckdns.org..." },
+  { kind: 'try', text: '• trying direct to 203.0.113.7:34059...' },
+  { kind: 'fail', text: '✕ direct connect failed — trying NAT traversal...' },
+  { kind: 'fail', text: '✕ traversal failed — falling back to relay...' },
+  { kind: 'ok', text: '● identity created in your browser' },
+  { kind: 'fp', text: `  ${f1}` },
+  { kind: 'fp', text: `  ${f2}` },
+  { kind: 'ok', text: '● connected via relay' },
+  { kind: 'dim', text: '— simulated peer · real X25519 + XSalsa20-Poly1305 —' },
+  { kind: 'dim', text: 'type a message, or `help`' },
+];
 
 interface CmdDef { desc: string; hidden?: boolean; run: (args: string, st: RState) => CmdOut }
+
+function sendMessage(text: string, st: RState): CmdOut {
+  const p = seal(text, me, world);
+  lastSealed = p;
+  sentLog.push(text);
+  const reply = REPLIES[(sentLog.length - 1) % REPLIES.length];
+  const q = seal(reply, world, me);
+  return {
+    lines: [
+      { kind: 'sys', key: 'you', text: text.slice(0, 70) },
+      wire(p),
+      { kind: 'sys', key: 'world', text: `authenticated, decrypted: ${open(p, me, world)}` },
+      { kind: 'sys', key: 'world', text: open(q, world, me) ?? '' },
+    ],
+    state: { sent: st.sent + 1 },
+  };
+}
 
 export const COMMANDS: Record<string, CmdDef> = {
   help: {
     desc: 'this list',
     run: () => ({
       lines: [
-        { kind: 'out', text: 'COMMANDS' },
-        { kind: 'out', text: '  install           pip install glypha (simulated)' },
-        { kind: 'out', text: '  start             boot your identity and listen' },
-        { kind: 'out', text: '  connect           find a peer through the rendezvous' },
-        { kind: 'out', text: '  verify            compare fingerprints out-of-band' },
-        { kind: 'out', text: '  send <message>    encrypt and transmit to your peer' },
-        { kind: 'out', text: '  peers             list known peers' },
-        { kind: 'out', text: '  whoami            who you are' },
-        { kind: 'out', text: '  ls / cat <file>   look around' },
-        { kind: 'out', text: '  clear             wipe the screen' },
+        { kind: 'out', text: 'type anything to send it. commands:' },
+        { kind: 'out', text: '  /whoami         your identity and fingerprint' },
+        { kind: 'out', text: '  /fingerprint    the peer fingerprint' },
+        { kind: 'out', text: '  /status         how this connection was made' },
+        { kind: 'out', text: '  /history        messages sent this session' },
+        { kind: 'out', text: '  tamper          flip one bit of your last message' },
+        { kind: 'out', text: '  clear           wipe the screen' },
         { kind: 'sp', text: '' },
-        { kind: 'dim', text: 'hidden commands exist — terminals reward the curious' },
+        { kind: 'dim', text: 'hidden commands exist. terminals reward the curious.' },
       ],
     }),
   },
-  install: {
-    desc: 'pip install glypha (simulated)',
-    run: (_a, st) => {
-      if (st.phase !== 'fresh') return { lines: [{ kind: 'dim', text: 'already installed — nothing to do' }] };
-      return {
-        lines: [
-          { kind: 'out', text: 'Collecting glypha' },
-          { kind: 'out', text: '  downloading glypha-0.1.0 — output abridged' },
-          { kind: 'ok', text: 'Successfully installed glypha-0.1.0' },
-        ],
-        state: { phase: 'installed' },
-      };
-    },
-  },
-  start: {
-    desc: 'boot your identity and listen',
-    run: (_a, st) =>
-      need(st, ['installed'], 'run `install` first') ?? {
-        lines: [
-          { kind: 'sys', key: 'identity', text: 'persistent keypair loaded' },
-          { kind: 'fp', text: `fingerprint  ${FP_A}` },
-          { kind: 'sys', key: 'net', text: 'rendezvous registered — coordination channel only' },
-          { kind: 'sys', key: 'net', text: 'listening for peers …' },
-        ],
-        state: { phase: 'started' },
-      },
-  },
-  connect: {
-    desc: 'find a peer through the rendezvous',
-    run: (_a, st) =>
-      need(st, ['started'], 'run `start` first') ?? {
-        lines: [
-          { kind: 'sys', key: 'net', text: 'rendezvous: peer discovered — bravo' },
-          { kind: 'sys', key: 'net', text: 'direct path established' },
-          { kind: 'fp', text: `peer fingerprint  ${FP_B}` },
-          { kind: 'dim', text: 'verify before sending anything — try `verify`' },
-        ],
-        state: { phase: 'connected' },
-      },
-  },
-  verify: {
-    desc: 'compare fingerprints out-of-band',
-    run: (_a, st) =>
-      need(st, ['connected', 'verified'], 'connect to a peer first') ?? {
-        lines: [
-          { kind: 'out', text: 'comparing bravo fingerprint — out-of-band channel' },
-          { kind: 'fp', text: `local     61AA 3B9D F2E4 7F3A` },
-          { kind: 'fp', text: `channel   61AA 3B9D F2E4 7F3A` },
-          { kind: 'out', text: '          9C1B 42DE 0817 E5C0 · 8/8 groups' },
-          { kind: 'ok', text: 'match — bravo verified' },
-        ],
-        state: { phase: 'verified' },
-      },
-  },
-  send: {
-    desc: 'encrypt and transmit to your peer',
-    run: (args, st) => {
-      if (!args.trim()) return { lines: [{ kind: 'err', text: 'usage: send <message>' }] };
-      return (
-        need(st, ['verified'], 'verify the peer first — `verify`') ?? {
-          lines: [
-            { kind: 'sys', key: 'you', text: args.trim().slice(0, 60) },
-            { kind: 'ciph', text: `${hex(args.trim()).slice(0, 35)} … in transit` },
-            { kind: 'sys', key: 'peer', text: 'received — authenticated, decrypted' },
-            { kind: 'dim', text: 'hint: try `cat history.db`' },
-          ],
-          state: { sent: st.sent + 1 },
-        }
-      );
-    },
-  },
-  peers: {
-    desc: 'list known peers',
-    run: (_a, st) => ({
-      lines: st.phase === 'fresh' || st.phase === 'installed'
-        ? [{ kind: 'out', text: 'no peers — not listening yet' }]
-        : [{ kind: 'out', text: 'bravo   61AA 3B9D F2E4 …   connected' }],
-    }),
-  },
   whoami: {
-    desc: 'who you are',
+    desc: 'identity',
+    run: () => {
+      const [a, b] = half(FP_ME);
+      return { lines: [
+        { kind: 'out', text: 'you: identity generated in this tab, gone on refresh' },
+        { kind: 'fp', text: `  ${a}` }, { kind: 'fp', text: `  ${b}` },
+      ] };
+    },
+  },
+  fingerprint: {
+    desc: 'peer fingerprint',
+    run: () => {
+      const [a, b] = half(FP_WORLD);
+      return { lines: [
+        { kind: 'out', text: 'peer fingerprint (compare out-of-band in the real app)' },
+        { kind: 'fp', text: `  ${a}` }, { kind: 'fp', text: `  ${b}` },
+      ] };
+    },
+  },
+  status: {
+    desc: 'connection',
     run: () => ({ lines: [
-      { kind: 'out', text: 'alpha — persistent identity' },
-      { kind: 'fp', text: `fingerprint  ${FP_A}` },
-      { kind: 'dim', text: '(you, presumably)' },
+      { kind: 'ok', text: '● connected via relay' },
+      { kind: 'out', text: '  direct: failed · NAT traversal: failed · relay: ok' },
+      { kind: 'dim', text: '  the relay splices bytes. it has no crypto library installed.' },
     ] }),
   },
-  ls: {
-    desc: 'look around',
-    run: () => ({ lines: [{ kind: 'out', text: 'identity.json   history.db   README.md' }] }),
+  history: {
+    desc: 'messages',
+    run: () => ({ lines: sentLog.length
+      ? [{ kind: 'dim', text: `history: showing last ${sentLog.length} of ${sentLog.length}` },
+         ...sentLog.map(t => ({ kind: 'out' as const, text: `  you  ${t}` }))]
+      : [{ kind: 'dim', text: 'no messages yet' }] }),
   },
-  cat: {
-    desc: 'read a file',
-    run: (args) => {
-      const f = args.trim();
-      if (f === 'history.db') {
-        return { lines: [
-          { kind: 'ciph', text: '9f 3a 7c 01 d4 ee 22 b8 5a 71 0c 9f 3e 48 d2 …' },
-          { kind: 'ciph', text: '44 1b 8e 90 2f c7 13 a6 5d 0b 99 e2 30 7f 4c …' },
-          { kind: 'dim', text: 'encrypted at rest — unreadable without your key. that\u2019s the point.' },
-        ] };
-      }
-      if (f === 'identity.json') {
-        return { lines: [
-          { kind: 'out', text: '{ "peer": "alpha", "fingerprint": "7F3A 9C1B 42DE …" }' },
-          { kind: 'dim', text: 'your keys never leave this machine' },
-        ] };
-      }
-      if (f === 'README.md') {
-        return { lines: [{ kind: 'dim', text: 'you\u2019re already on the website — github.com/Aadarsh6/glypha' }] };
-      }
-      return { lines: [{ kind: 'err', text: `cat: ${f || '?'}: no such file` }] };
+  tamper: {
+    desc: 'flip one bit',
+    run: () => {
+      if (!lastSealed) return { lines: [{ kind: 'err', text: 'send a message first, then tamper with it' }] };
+      const b = new Uint8Array(lastSealed.box);
+      b[b.length >> 1] ^= 1;
+      const ok = nacl.box.open(b, lastSealed.nonce, me.publicKey, world.secretKey);
+      return { lines: [
+        { kind: ok ? 'err' : 'fail', text: ok ? 'unexpected: tampered message accepted' : '✕ one bit flipped in transit: authentication failed, message not delivered' },
+        { kind: 'dim', text: 'the cipher is authenticated. changing the ciphertext breaks it.' },
+      ] };
     },
   },
-  ping: { hidden: true, desc: '', run: () => ({ lines: [{ kind: 'dim', text: 'this is a simulation — no packets were harmed' }] }) },
-  sudo: { hidden: true, desc: '', run: (args) => ({ lines: [{ kind: 'dim', text: `sudo: ${args.trim() || '…'} — you\u2019re already the root of your own machine` }] }) },
+  ls: { desc: 'look around', hidden: true, run: () => ({ lines: [{ kind: 'out', text: 'identity.bin   history.db   known_peers.json' }] }) },
+  ping: { hidden: true, desc: '', run: () => ({ lines: [{ kind: 'dim', text: 'this is a simulation. no packets were harmed' }] }) },
+  sudo: { hidden: true, desc: '', run: (a) => ({ lines: [{ kind: 'dim', text: `sudo: ${a.trim() || '…'}: you're already the root of your own machine` }] }) },
   rm: { hidden: true, desc: '', run: () => ({ lines: [{ kind: 'err', text: 'rm: this terminal guards its own filesystem. (also: no.)' }] }) },
-  exit: { hidden: true, desc: '', run: () => ({ lines: [{ kind: 'dim', text: 'a peer-to-peer connection doesn\u2019t exit — it just goes quiet' }] }) },
+  exit: { hidden: true, desc: '', run: () => ({ lines: [{ kind: 'dim', text: "a peer-to-peer connection doesn't exit, it just goes quiet" }] }) },
 };
 
 export function nextHint(st: RState): string {
-  switch (st.phase) {
-    case 'fresh': return 'install';
-    case 'installed': return 'start';
-    case 'started': return 'connect';
-    case 'connected': return 'verify';
-    case 'verified': return st.sent === 0 ? 'send hello' : 'cat history.db';
-  }
+  return st.phase === 'fresh' ? '…' : st.sent === 0 ? 'say hello' : 'tamper';
 }
 
 export function runCommand(raw: string, st: RState): { lines: RLine[]; state: RState } {
   const input = raw.trim();
-  let name = input.toLowerCase();
-  if (name === 'pip install glypha') name = 'install';
+  let name = input.toLowerCase().replace(/^\//, '');
   if (name.startsWith('glypha ')) name = name.slice(7).trim();
-  if (name === 'glypha') name = 'help';
-  if (name.startsWith('sudo ') || name === 'sudo') return sudoPath(input, st);
-  const def = COMMANDS[name];
-  if (!def) {
-    return {
-      lines: [{ kind: 'err', text: `command not found: ${input.split(' ')[0]} — type \`help\`` }],
-      state: st,
-    };
+  const word = name.split(' ')[0];
+  const def = COMMANDS[word];
+  if (def && (name === word || word === 'sudo' || word === 'rm')) {
+    const out = def.run(name.slice(word.length), st);
+    return { lines: out.lines, state: { ...st, ...out.state } };
   }
-  const args = input.slice(name.length).trim();
-  const out = def.run(name === 'cat' || name === 'send' ? raw.trim().slice(name.length).trim() : args, st);
+  // like the real chat: anything that is not a command is a message
+  const out = sendMessage(input, st);
   return { lines: out.lines, state: { ...st, ...out.state } };
-}
-
-function sudoPath(input: string, st: RState): { lines: RLine[]; state: RState } {
-  const out = COMMANDS.sudo.run(input.slice(5), st);
-  return { lines: out.lines, state: st };
 }

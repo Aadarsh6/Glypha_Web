@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from '../hooks';
 import { Icon, CopyButton, Reveal } from './ui';
 import { TerminalRepl } from './TerminalRepl';
+import { NatDiagram, type NatSignal } from './NatDiagram';
 
 function FieldCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -109,19 +110,20 @@ function FieldCanvas() {
 }
 
 export function Hero() {
+  const [sig, setSig] = useState<NatSignal>({ stage: 0, sent: 0, tampers: 0 });
   return (
     <section id="hero">
       <FieldCanvas />
       <div className="wrap relative z-[1] grid w-full items-center gap-[clamp(24px,3vw,48px)] lg:grid-cols-12">
-        <div className="lg:col-span-5">
+        <div className="lg:col-span-6">
           <p className="tag"><b>Open source</b> · Python · peer-to-peer</p>
           <h1>
-            Not another chat server.
-            <span className="l2">A connection between peers.</span>
+            The code is right.
+            <span className="l2">The networks refuse.</span>
           </h1>
           <p className="hero-p">
-            An open-source Python tool for encrypted peer-to-peer messaging, with persistent
-            identities and verifiable peer fingerprints. No accounts — your keys are your identity.
+            Peer-to-peer encrypted chat where every layer is readable Python: framing, identity,
+            NAT traversal, relay. Including the parts that fail. Educational, and deliberately not Signal.
           </p>
           <div className="cta-row">
             <a className="btn btn-primary" href="#quickstart">Get started</a>
@@ -135,8 +137,11 @@ export function Hero() {
           </div>
         </div>
 
-        <Reveal delay={120} className="lg:col-span-7 min-w-0">
-          <TerminalRepl />
+        <Reveal delay={120} className="lg:col-span-6 min-w-0">
+          <div className="grid gap-4">
+            <NatDiagram {...sig} />
+            <TerminalRepl onSignal={setSig} />
+          </div>
         </Reveal>
       </div>
     </section>

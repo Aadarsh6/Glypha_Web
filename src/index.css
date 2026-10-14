@@ -110,7 +110,7 @@ h2 { font: 600 clamp(30px, 4vw, 44px)/1.08 var(--font-display); letter-spacing: 
 #hero { position: relative; overflow: hidden; padding-top: 128px; padding-bottom: 64px;
   min-height: 96svh; display: flex; align-items: center; }
 #field { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-#hero h1 { font: 600 clamp(42px, 5.6vw, 72px)/1.03 var(--font-display);
+#hero h1 { font: 600 clamp(38px, 4.4vw, 62px)/1.04 var(--font-display);
   letter-spacing: -.015em; margin: 22px 0 20px; }
 #hero h1 .l2 { display: block; color: var(--color-mute); }
 .hero-p { color: var(--color-mute); max-width: 46ch; margin-bottom: 32px; }
@@ -131,7 +131,7 @@ h2 { font: 600 clamp(30px, 4vw, 44px)/1.08 var(--font-display); letter-spacing: 
   font: 500 9.5px var(--font-mono); letter-spacing: .14em; color: var(--color-warn);
   border: 1px solid rgba(231, 184, 109, .38); padding: 5px 9px; }
 .badge-sim i { width: 5px; height: 5px; background: var(--color-warn); flex: none; }
-.term-body { height: min(52vh, 420px); overflow-y: auto; padding: 18px 16px 14px;
+.term-body { height: min(32vh, 250px); overflow-y: auto; padding: 18px 16px 14px;
   font: 400 12.5px/1.8 var(--font-mono); }
 .ln { white-space: pre-wrap; word-break: break-word; color: var(--color-mute); }
 .ln-cmd .p { color: var(--color-accent); margin-right: 10px; }
@@ -515,3 +515,16 @@ html.lenis, html.lenis body { height: auto; }
 @media (prefers-reduced-motion: reduce) {
   .rf-edge-flow, .rf-edge-meta { animation: none; }
 }
+/* connection-ladder states: blue = trying, red = refused */
+.ln-try { color: #6E9BFF; }
+.ln-fail { color: #FF7A59; }
+
+/* NAT diagram: the connection ladder, drawn */
+.natbox { border: 1px solid var(--color-line); background: var(--color-panel); }
+.nat-head { display: flex; justify-content: space-between; padding: 10px 14px; font: 500 11px/1 var(--font-mono);
+  letter-spacing: .08em; color: var(--color-faint); border-bottom: 1px solid var(--color-line); }
+.nat-svg { display: block; width: 100%; height: auto; }
+.nat-cap { margin: 0; padding: 10px 14px 12px; min-height: 44px; font: 400 12px/1.45 var(--font-mono);
+  color: #B9C0B7; border-top: 1px solid var(--color-line); }
+.natflow { animation: natdash .8s linear infinite; }
+@keyframes natdash { to { stroke-dashoffset: -16; } }
