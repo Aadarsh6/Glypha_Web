@@ -23,7 +23,7 @@ export function Security() {
     <section id="security" data-shot="security" className="hairtop">
       <div className="wrap">
         <SectionHead
-          index="04" kicker="Security model"
+          index="05" kicker="Security model"
           title="Deliberately not Signal."
           lede="The gaps are stated, not implied. Glypha exists so you can read and understand every layer it stands on — which starts with knowing exactly where the guarantees end."
         />

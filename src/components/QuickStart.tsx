@@ -43,7 +43,7 @@ export function QuickStart() {
     <section id="quickstart" data-shot="quickstart" className="hairtop">
       <div className="wrap">
         <SectionHead
-          index="05" kicker="Quick start"
+          index="01" kicker="Quick start"
           title="From package to first message."
           lede="Every command below is real — the same ones from the README. The full walkthrough, including self-hosting with DuckDNS, lives in the repository."
         />
@@ -104,7 +104,7 @@ export function QuickStart() {
         </Reveal>
 
         <Reveal className="qs-step">
-          <div className="qs-n">05</div>
+          <div className="qs-n">01</div>
           <div>
             <h3>Talk</h3>
             <p className="qd">

@@ -20,7 +20,7 @@ export function Stack() {
     <section id="stack" data-shot="stack" className="hairtop">
       <div className="wrap">
         <SectionHead
-          index="01" kicker="The stack"
+          index="03" kicker="The stack"
           title="Implemented, not imported."
           lede="Most chat tutorials hand you a networking SDK and never explain what's underneath. Glypha goes the other direction — every layer is readable Python, and every engineering decision, including the failures, is documented."
         />
