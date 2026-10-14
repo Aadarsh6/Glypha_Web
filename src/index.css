@@ -97,49 +97,6 @@ section { position: relative; padding-block: clamp(96px, 12vw, 176px); }
 .copy.ok { color: var(--color-accent); }
 .cta-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
 
-/* ---------- nav ---------- */
-#nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: 60px;
-  background: rgba(6, 7, 6, .55); backdrop-filter: blur(10px);
-  border-bottom: 1px solid transparent; transition: border-color .25s; }
-#nav.sc { border-color: var(--color-line); }
-#nav .wrap { height: 60px; display: flex; align-items: center;
-  justify-content: space-between; }
-.brand { display: flex; align-items: center; gap: 10px; text-decoration: none;
-  font: 600 16px var(--font-display); letter-spacing: .09em; color: var(--color-ink); }
-.logo-g { width: 21px; height: 21px; fill: none;
-  stroke: var(--color-ink); stroke-width: 1.7; }
-.logo-g line { stroke: var(--color-accent); stroke-width: 1.9; }
-.nlinks { display: flex; align-items: center; gap: 2px; }
-.nlink { font: 500 13px var(--font-body); color: var(--color-mute);
-  text-decoration: none; padding: 8px 11px; transition: color .18s; }
-.nlink:hover { color: var(--color-ink); }
-.nlink.on { color: var(--color-ink); }
-.nlink.on::after { content: ""; display: block; height: 1px;
-  background: var(--color-accent); margin-top: 2px; }
-.navstat { font: 500 9.5px var(--font-mono); letter-spacing: .14em;
-  color: var(--color-faint); margin: 0 14px; white-space: nowrap; }
-.navstat b { color: var(--color-accent); font-weight: 500; }
-.ghnav { height: 34px; padding: 0 13px; display: inline-flex;
-  align-items: center; gap: 8px; border: 1px solid var(--color-line);
-  color: var(--color-ink); text-decoration: none;
-  font: 500 13px var(--font-body);
-  transition: border-color .18s, background .18s; }
-.ghnav:hover { border-color: #3E463E; background: var(--color-elev); }
-#menu-btn { display: none; width: 38px; height: 38px; background: none;
-  border: 1px solid var(--color-line); color: var(--color-ink); cursor: pointer;
-  align-items: center; justify-content: center; }
-.mnav { display: none; position: absolute; top: 60px; left: 0; right: 0;
-  background: var(--color-bg); border-bottom: 1px solid var(--color-line);
-  padding: 10px 24px 18px; }
-.mnav a { display: flex; justify-content: space-between; align-items: center;
-  padding: 13px 2px; color: var(--color-ink); text-decoration: none;
-  font: 500 15px var(--font-body); border-bottom: 1px solid #121612; }
-#nav.open .mnav { display: block; }
-@media (max-width: 920px) {
-  .nlinks, .navstat { display: none; }
-  #menu-btn { display: inline-flex; }
-}
-
 /* ---------- hero — centered brand poster, ONE screen ---------- */
 .hero { min-height: 100svh; display: flex; align-items: stretch;
   padding-top: 78px; padding-bottom: 18px; }
