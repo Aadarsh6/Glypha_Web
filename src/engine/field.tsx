@@ -20,6 +20,7 @@ export interface Stats { nodes: number; pkt: number }
 type StatsFn = (s: Stats) => void;
 const statsFns = new Set<StatsFn>();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function onFieldStats(fn: StatsFn): () => void {
   statsFns.add(fn);
   return () => { statsFns.delete(fn); };
@@ -52,7 +53,7 @@ export function Field() {
     let last = 0, spawn = 0, spawnCount = 0, statTime = 0, driftA = 0;
     let dirty = true;
 
-    let cur = { yaw: SHOTS.hero.yaw, pitch: SHOTS.hero.pitch, dist: SHOTS.hero.dist, obs: 0 };
+    const cur = { yaw: SHOTS.hero.yaw, pitch: SHOTS.hero.pitch, dist: SHOTS.hero.dist, obs: 0 };
     let shot: Shot = SHOTS.hero;
     let tx = 0, ty = 0;
 
@@ -69,16 +70,16 @@ export function Field() {
         });
       }
       const LINK = 300, L2 = LINK * LINK;
-      const cand: { a: number; b: number; d2: number }[] = [];
+      const candidates: { a: number; b: number; d2: number }[] = [];
       for (let i = 0; i < count; i++) {
         for (let j = i + 1; j < count; j++) {
           const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y, dz = nodes[i].z - nodes[j].z;
           const d2 = dx * dx + dy * dy + dz * dz;
-          if (d2 < L2) cand.push({ a: i, b: j, d2 });
+          if (d2 < L2) candidates.push({ a: i, b: j, d2 });
         }
       }
-      cand.sort((p, q) => p.d2 - q.d2);
-      edges = cand.slice(0, 340).map(c => ({ a: c.a, b: c.b }));
+      candidates.sort((p, q) => p.d2 - q.d2);
+      edges = candidates.slice(0, 340).map(c => ({ a: c.a, b: c.b }));
       spokes = nodes
         .map((n, i) => ({ i, d: (n.x - OBS.x) ** 2 + (n.y - OBS.y) ** 2 + (n.z - OBS.z) ** 2 }))
         .sort((p, q) => p.d - q.d)

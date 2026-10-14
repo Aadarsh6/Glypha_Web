@@ -1,19 +1,31 @@
-const REPO = 'https://github.com/Aadarsh6/GLYPHA';
+import { Field } from './engine/field';
+// import { Nav } from './components/Nav';
+import { Hero } from './components/Hero';
+// import { Stack } from './components/Stack';
+import { Ladder } from './components/Ladder';
+import { Notes } from './components/Notes';
+// import { Security } from './components/Security';
+import { QuickStart } from './components/QuickStart';
+// import { Outro } from './components/Outro';
+import { Footer } from './components/Footer';
+import { Nav } from './components/Navbar';
+import { Stack } from './components/Stcak';
 
-export function Footer() {
+export default function App() {
   return (
-    <footer>
-      <div className="wrap">
-        <div className="fbot">
-          <span>GLYPHA · SOCKETS UP · KEYS LOCAL · RELAY WHEN NATS SAY NO</span>
-          <span>
-            <a href={REPO} target="_blank" rel="noopener" style={{ color: 'inherit', textDecoration: 'none' }}>GITHUB</a>
-            {' · '}
-            <a href="https://pypi.org/project/glypha/" target="_blank" rel="noopener" style={{ color: 'inherit', textDecoration: 'none' }}>PYPI</a>
-            {' · MIT · 22 TESTS · NO TRACKERS'}
-          </span>
-        </div>
-      </div>
-    </footer>
+    <>
+      <Field />
+      <Nav />
+      <main className="page">
+        <Hero />
+        <Stack />
+        <Ladder />
+        <Notes />
+        <Security />
+        <QuickStart />
+        <Outro />
+      </main>
+      <Footer />
+    </>
   );
 }
