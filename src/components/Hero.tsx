@@ -13,11 +13,45 @@ export function Hero() {
         <p className="kicker hero-top">PEER-TO-PEER ENCRYPTED CHAT · EVERY LAYER BY HAND</p>
 
         <div className="hero-mid">
-          <svg className="hero-mark" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="6.5" cy="17.5" r="4.2" />
-            <circle cx="17.5" cy="6.5" r="4.2" />
-            <line x1="9.7" y1="14.3" x2="14.3" y2="9.7" />
-          </svg>
+ <svg
+    className="hero-mark"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 512 512"
+    role="img"
+    aria-label="Glypha"
+  >
+    <rect width="512" height="512" rx="112" fill="#0C0C0C" />
+    <rect
+      x="1.5"
+      y="1.5"
+      width="509"
+      height="509"
+      rx="110.5"
+      fill="none"
+      stroke="#FFFFFF"
+      strokeOpacity=".09"
+      strokeWidth="3"
+    />
+
+    <g shapeRendering="crispEdges">
+      <rect x="166" y="102" width="52" height="52" fill="#ECEBE6" />
+      <rect x="230" y="102" width="52" height="52" fill="#ECEBE6" />
+      <rect x="294" y="102" width="52" height="52" fill="#ECEBE6" />
+
+      <rect x="102" y="166" width="52" height="52" fill="#ECEBE6" />
+      <rect x="102" y="230" width="52" height="52" fill="#ECEBE6" />
+
+      <rect x="294" y="230" width="52" height="52" fill="#67DDA1" />
+      <rect x="358" y="230" width="52" height="52" fill="#ECEBE6" />
+
+      <rect x="102" y="294" width="52" height="52" fill="#ECEBE6" />
+      <rect x="358" y="294" width="52" height="52" fill="#ECEBE6" />
+
+      <rect x="166" y="358" width="52" height="52" fill="#ECEBE6" />
+      <rect x="230" y="358" width="52" height="52" fill="#ECEBE6" />
+      <rect x="294" y="358" width="52" height="52" fill="#ECEBE6" />
+    </g>
+  </svg>
 
           <div className="wm-wrap">
             <h1 className="wordmark"><Decode text="GLYPHA" delay={150} /></h1>
