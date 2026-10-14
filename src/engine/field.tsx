@@ -16,9 +16,10 @@ const SHOTS: Record<ShotId, Shot> = {
   source:    { yaw: 2.40, pitch: 0.42, dist: 1.55, drift: 0.034, observer: false },
 };
 
-interface Stats { nodes: number; pkt: number }
+export interface Stats { nodes: number; pkt: number }
 type StatsFn = (s: Stats) => void;
 const statsFns = new Set<StatsFn>();
+
 export function onFieldStats(fn: StatsFn): () => void {
   statsFns.add(fn);
   return () => { statsFns.delete(fn); };

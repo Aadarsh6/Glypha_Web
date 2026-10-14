@@ -1,20 +1,25 @@
 import { useEffect, useState } from 'react';
+import { onFieldStats, type Stats } from '../engine/field';
 import { Icon } from './ui';
 
 const LINKS = [
-  { href: '#how-it-works', id: 'how-it-works', label: 'How it works' },
+  { href: '#stack', id: 'stack', label: 'The stack' },
+  { href: '#ladder', id: 'ladder', label: 'Ladder' },
+  { href: '#notes', id: 'notes', label: 'Field notes' },
   { href: '#security', id: 'security', label: 'Security' },
   { href: '#quickstart', id: 'quickstart', label: 'Quick start' },
-  { href: '#observatory', id: 'observatory', label: 'Observatory' },
 ];
 
-export function Navbar() {
+export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('');
+  const [stats, setStats] = useState<Stats>({ nodes: 0, pkt: 0 });
+
+  useEffect(() => onFieldStats(setStats), []);
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 8);
+    const fn = () => setScrolled(window.scrollY > 10);
     fn();
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
@@ -23,7 +28,7 @@ export function Navbar() {
   useEffect(() => {
     const spy = new IntersectionObserver(
       es => es.forEach(en => { if (en.isIntersecting) setActive(en.target.id); }),
-      { rootMargin: '-45% 0px -50% 0px' },
+      { rootMargin: '-40% 0px -40% 0px' },
     );
     LINKS.forEach(l => { const el = document.getElementById(l.id); if (el) spy.observe(el); });
     return () => spy.disconnect();
@@ -40,8 +45,7 @@ export function Navbar() {
       <div className="wrap">
         <a className="brand" href="#hero" aria-label="Glypha — back to top">
           <svg className="logo-g" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="6.5" cy="17.5" r="4.2" />
-            <circle cx="17.5" cy="6.5" r="4.2" />
+            <circle cx="6.5" cy="17.5" r="4.2" /><circle cx="17.5" cy="6.5" r="4.2" />
             <line x1="9.7" y1="14.3" x2="14.3" y2="9.7" />
           </svg>
           GLYPHA
@@ -51,26 +55,25 @@ export function Navbar() {
           {LINKS.map(l => (
             <a key={l.href} className={`nlink ${active === l.id ? 'on' : ''}`} href={l.href}>{l.label}</a>
           ))}
-          <a className="ghnav" href="https://github.com/Aadarsh6/glypha" target="_blank" rel="noopener">
+          <span className="navstat"><b>{stats.nodes}</b> NODES · <b>{stats.pkt}</b> PKT/S</span>
+          <a className="ghnav" href="https://github.com/Aadarsh6/GLYPHA" target="_blank" rel="noopener">
             <Icon name="github" size={16} />GitHub<Icon name="ext" size={12} />
           </a>
         </nav>
 
-        <button
-          id="menu-btn" aria-expanded={open} aria-controls="mnav" aria-label="Menu"
-          onClick={() => setOpen(!open)}
-        >
-          <Icon name="minus" />
+        <button id="menu-btn" aria-expanded={open} aria-controls="mnav" aria-label="Menu"
+          onClick={() => setOpen(!open)}>
+          <Icon name={open ? 'minus' : 'menu'} />
         </button>
 
         <div className="mnav" id="mnav">
           {LINKS.map(l => (
             <a key={l.href} href={l.href} onClick={() => setOpen(false)}>
-              {l.label} <Icon name="arrow" size={13} />
+              {l.label}<Icon name="arrow" size={13} />
             </a>
           ))}
-          <a href="https://github.com/Aadarsh6/glypha" target="_blank" rel="noopener" onClick={() => setOpen(false)}>
-            GitHub <Icon name="ext" size={13} />
+          <a href="https://github.com/Aadarsh6/GLYPHA" target="_blank" rel="noopener" onClick={() => setOpen(false)}>
+            GitHub<Icon name="ext" size={13} />
           </a>
         </div>
       </div>
