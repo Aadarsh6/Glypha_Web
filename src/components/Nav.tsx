@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
-import { onFieldStats } from '../engine/field';
+import { onFieldStats, type Stats } from '../engine/field';
 import { Icon } from './ui';
 
-type Stats = { nodes: number; pkt: number };
-
 const LINKS = [
+  { href: '#quickstart', id: 'quickstart', label: 'Quick start' },
+  { href: '#ladder', id: 'ladder', label: 'How it works' },
   { href: '#stack', id: 'stack', label: 'The stack' },
-  { href: '#ladder', id: 'ladder', label: 'Ladder' },
   { href: '#notes', id: 'notes', label: 'Field notes' },
   { href: '#security', id: 'security', label: 'Security' },
-  { href: '#quickstart', id: 'quickstart', label: 'Quick start' },
 ];
 
 export function Nav() {
@@ -57,9 +55,12 @@ export function Nav() {
           {LINKS.map(l => (
             <a key={l.href} className={`nlink ${active === l.id ? 'on' : ''}`} href={l.href}>{l.label}</a>
           ))}
-          <span className="navstat"><b>{stats.nodes}</b> NODES · <b>{stats.pkt}</b> PKT/S</span>
+          <span className="navstat"><b>{stats.nodes.toLocaleString()}</b> GLYPHS · <b>{stats.pkt}</b> PKT/S</span>
+          <a className="ghnav" href="https://pypi.org/project/glypha/" target="_blank" rel="noopener">
+            PyPI<Icon name="ext" size={12} />
+          </a>
           <a className="ghnav" href="https://github.com/Aadarsh6/GLYPHA" target="_blank" rel="noopener">
-            <Icon name="github" size={16} />GitHub<Icon name="ext" size={12} />
+            <Icon name="github" size={15} />GitHub<Icon name="ext" size={12} />
           </a>
         </nav>
 
@@ -74,6 +75,9 @@ export function Nav() {
               {l.label}<Icon name="arrow" size={13} />
             </a>
           ))}
+          <a href="https://pypi.org/project/glypha/" target="_blank" rel="noopener" onClick={() => setOpen(false)}>
+            PyPI<Icon name="ext" size={13} />
+          </a>
           <a href="https://github.com/Aadarsh6/GLYPHA" target="_blank" rel="noopener" onClick={() => setOpen(false)}>
             GitHub<Icon name="ext" size={13} />
           </a>
